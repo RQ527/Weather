@@ -5,7 +5,7 @@ import com.example.weather.room.MyConverters
 
 /**
  * ...
- *
+ * 对应天气类
  * @author 1799796122 (Ran Sixiang)
  * @email 1799796122@qq.com
  * @date 2022/1/16
@@ -60,6 +60,8 @@ data class Weather(
         val wind_scale: String,
         val wind_speed: String
     ) {
+
+
         data class Aqi(
             val air: String,
             val air_level: String,
@@ -126,4 +128,5 @@ data class Weather(
             )
         }
     }
+
 }

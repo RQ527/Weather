@@ -1,6 +1,6 @@
 package com.example.weather;
 
-import android.os.AsyncTask;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -30,20 +30,25 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private Button button;
     private TextView textView;
     private Handler mHandler;
-    private WeatherDao weatherDao;
+    private static Context context;
+    private  MyDataBase myDataBase;
+    private  WeatherDao weatherDao;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = getApplicationContext();
         setContentView(R.layout.activity_main);
-
-        MyDataBase dataBase = MyDataBase.getInstance(this);
-        weatherDao = dataBase.getWeatherDao();
+        myDataBase = MyDataBase.getInstance(this);
+        weatherDao = myDataBase.getWeatherDao();
 
         initView();
 
-
-
+    }
+    public static Context getContext(){
+        return context;
     }
 
     private void initView() {
@@ -100,46 +105,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             Gson gson = new Gson();
             Weather weather = gson.fromJson(responseData,Weather.class);
             weather.setCity(editText.getText().toString());
-            weather.setId(0);
 
-            Weather.Data data =  weather.getData();
-            String air = data.getAir();
-            String city = weather.getCity();
-            textView.setText(city);
 
-            new InsertWeather(weatherDao).execute(weather);
+
+
 
         }
     }
 
-    class InsertWeather extends AsyncTask<Weather,Void,Void> {
 
-        private WeatherDao weatherDao;
 
-        public InsertWeather(WeatherDao weatherDao) {
-            this.weatherDao = weatherDao;
-        }
 
-        @Override
-        protected Void doInBackground(Weather... weathers) {
-            weatherDao.insertWeather(weathers);
-            return null;
-        }
+
     }
 
-    class GetWeather extends AsyncTask<Void,Void,Void>{
 
-        private WeatherDao weatherDao;
 
-        public GetWeather(WeatherDao weatherDao) {
-            this.weatherDao = weatherDao;
-        }
 
-        @Override
-        protected Void doInBackground(Void... voids) {
-            weatherDao.getWeatherByCity("")
-            return null;
-        }
-    }
-
-}
