@@ -6,6 +6,8 @@ import com.example.weather.bean.Weather;
 import com.example.weather.room.IDispose;
 import com.example.weather.room.WeatherDao;
 
+import java.util.List;
+
 /**
  * ...
  *
@@ -46,6 +48,10 @@ public class RoomUtils {
         new GetWeatherTask(weatherDao, city, dispose).execute();
     }
 
+    public static void queryAll(IDispose dispose,WeatherDao weatherDao){
+        new GetAllWeathersTask(weatherDao,dispose).execute();
+    }
+
     /**
      * 更新数据的方法
      * @param weatherDao 用于操作Room的Dao对象
@@ -55,6 +61,30 @@ public class RoomUtils {
         //更新方法有问题，所以我采用删除数据库再添加新数据的方法更新
         delete(weatherDao,city);
         insert(weatherDao,weather);
+    }
+
+    static class GetAllWeathersTask extends AsyncTask<Void,Void,Void> {
+
+        private WeatherDao weatherDao;
+        private List<Weather> weathers;
+        private IDispose dispose;
+
+        public GetAllWeathersTask(WeatherDao weatherDao,IDispose dispose) {
+            this.weatherDao = weatherDao;
+            this.dispose = dispose;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            weathers = weatherDao.getAllWeathers();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            dispose.runOnUi(weathers);
+        }
     }
 
     //用于查询数据库的异步类

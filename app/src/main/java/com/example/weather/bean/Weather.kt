@@ -5,7 +5,7 @@ import com.example.weather.room.MyConverters
 
 /**
  * ...
- * 对应天气类
+ * 数据库与Gson对应的天气类
  * @author 1799796122 (Ran Sixiang)
  * @email 1799796122@qq.com
  * @date 2022/1/16

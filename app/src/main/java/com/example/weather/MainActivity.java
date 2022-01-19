@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 
 import com.example.weather.base.BaseActivity;
 import com.example.weather.bean.Weather;
@@ -30,10 +31,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private Button button;
     private TextView textView;
     private Handler mHandler;
-    private static Context context;
-    private  MyDataBase myDataBase;
-    private  WeatherDao weatherDao;
+    private static Context context;//全局获取上下文
 
+    private MyDataBase myDataBase;
+
+    private WeatherDao weatherDao;
 
 
     @Override
@@ -44,10 +46,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         myDataBase = MyDataBase.getInstance(this);
         weatherDao = myDataBase.getWeatherDao();
 
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
+
         initView();
 
+
     }
-    public static Context getContext(){
+
+    public static Context getContext() {
         return context;
     }
 
@@ -60,15 +69,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         button.setOnClickListener(this);
     }
 
+
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.button:
-                try {
-                    run();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
 
                 break;
 
@@ -94,6 +99,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 });
     }
 
+    /**
+     * 自定义Handler处理网络请求结果
+     */
     private class MyHandler extends Handler {
 
         @Override
@@ -103,21 +111,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             String responseData = msg.obj.toString();
 
             Gson gson = new Gson();
-            Weather weather = gson.fromJson(responseData,Weather.class);
+            Weather weather = gson.fromJson(responseData, Weather.class);
             weather.setCity(editText.getText().toString());
-
-
-
 
 
         }
     }
 
 
-
-
-
-    }
+}
 
 
 

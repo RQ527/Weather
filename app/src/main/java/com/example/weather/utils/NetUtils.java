@@ -1,20 +1,14 @@
 package com.example.weather.utils;
 
-import androidx.annotation.NonNull;
-
-import java.io.IOException;
-import java.util.HashMap;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  * ...
- *
+ * 抽离的网络请求工具
  * @author 1799796122 (Ran Sixiang)
  * @email 1799796122@qq.com
  * @date 2022/1/16

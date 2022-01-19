@@ -2,6 +2,8 @@ package com.example.weather.room;
 
 import com.example.weather.bean.Weather;
 
+import java.util.List;
+
 /**
  * ...
  *
@@ -10,5 +12,15 @@ import com.example.weather.bean.Weather;
  * @date 2022/1/17
  */
 public interface IDispose {
+    /**
+     * 如果查询的是一个weather则使用此方法
+     * @param weather
+     */
     void runOnUi(Weather weather);
+
+    /**
+     * 如果查询的是多个weather方法则使用此方法
+     * @param weathers
+     */
+    void runOnUi(List<Weather> weathers);
 }
