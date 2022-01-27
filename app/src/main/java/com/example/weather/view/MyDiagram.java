@@ -39,32 +39,32 @@ import java.util.List;
  */
 public class MyDiagram extends ViewGroup {
     private static final String TAG = "RQ";
-    private Weather weather;//weather数据
     private int height;//控件高度
     private int screenWidth;//屏幕宽度
-    private View view;//展示天气的视图
+    private int minTemp = 0;//最小温度初始值为0
+    private int viewWidth;//view的宽
+    private int size = 1;//视图数量初始值为1
     private float scaleX;//X轴缩放比率
     private float scaleY;//Y轴缩放比率
-    private int minTemp = 0;//最小温度
+    private float differDistance;//与整数倍的viewWidth的偏移量
+    private float drawX = 100;//圆环圆心初始值为100
+    private float drawY = 300;//圆环圆心初始值为300
     private GestureDetector detector;//手势辅助器
-    private float drawX = 100;//圆环圆心
-    private float drawY = 300;//圆环圆心
+    private VelocityTracker mVelocityTracker;//滑动速度追踪器
+    private FlingRunnable mFling;//惯性滑动线程
+    private List<Point> points;//曲线上点的集合
+    private Scroller mScroller;//优化滑动效果的工具
+    private Boolean isFlinging = false;//是否正在惯性滑动的标志
+    private Weather weather;//weather数据
     private Paint curvePaint;//曲线画笔
     private Paint whiteCirclePaint;//圆环内园画笔
     private Paint textPaint;//文字画笔
     private Paint dottedPaint;//虚线画笔
     private Path curvePath;//曲线路径
     private Path dottedPath;//虚线路径
-    private Scroller mScroller;//优化滑动效果的工具
-    private VelocityTracker mVelocityTracker;//滑动速度追踪器
-    private int viewWidth;//view的宽
-    private Boolean isFlinging = false;//是否正在惯性滑动的标志
-    private FlingRunnable mFling;//惯性滑动线程
-    float differDistance;//与整数倍的viewWidth的偏移量
-    private List<Point> points;//曲线上点的集合
+    private View view;//展示天气的视图
 
     public MyDiagram(Context context, AttributeSet attrs) {
-
         super(context, attrs);
         //允许ViewGroup的onDraw生效
         setWillNotDraw(false);
@@ -80,10 +80,31 @@ public class MyDiagram extends ViewGroup {
     }
 
     /**
+     * 初始化其他东西
+     */
+    private void init() {
+
+        mVelocityTracker = VelocityTracker.obtain();
+        mScroller = new Scroller(MainActivity.getContext());
+        screenWidth = getScreenWidth();
+        viewWidth = (int) (screenWidth / 5.0);
+
+        //初始化手势识别器
+        detector = new GestureDetector(MainActivity.getContext(), new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                scrollTo((int) distanceX + getScrollX(), 0);
+                //mMoveDrawRun.run();
+                return true;
+            }
+        });
+
+    }
+
+    /**
      * 初始化路径
      */
     public void initPath() {
-
         curvePath = new Path();
         //这里面减0.1是为了防止误差画圆环找不到圆心，具体看画圆心的原理。
         curvePath.moveTo((float) (points.get(0).x - 0.5), points.get(0).y);
@@ -94,12 +115,15 @@ public class MyDiagram extends ViewGroup {
                     (points.get(i).x + points.get(i + 1).x) / 2,
                     points.get(i + 1).y, (float) (points.get(i + 1).x + 0.1), points.get(i + 1).y);
         }
-
         dottedPath = new Path();
     }
 
+    /**
+     * 初始化画笔
+     */
     private void initPaint() {
         mFling = new FlingRunnable(MainActivity.getContext());
+
         curvePaint = new Paint();
         curvePaint.setAntiAlias(true);
         curvePaint.setColor(Color.parseColor("#FF03DAC5"));
@@ -124,6 +148,9 @@ public class MyDiagram extends ViewGroup {
         dottedPaint.setStyle(Paint.Style.STROKE);
     }
 
+    /**
+     * 初始化天气数据
+     */
     public void initWeather() {
         //防止weather为空，因此设置了假数据,也是累死了.
         if (weather == null) {
@@ -157,29 +184,6 @@ public class MyDiagram extends ViewGroup {
         //将weather的温度转化成点。
         points = weatherToPoint(weather);
     }
-
-    /**
-     * 初始化其他东西
-     */
-    private void init() {
-
-        mVelocityTracker = VelocityTracker.obtain();
-        mScroller = new Scroller(MainActivity.getContext());
-        screenWidth = getScreenWidth();
-        viewWidth = (int) (screenWidth / 5.0);
-
-        //初始化手势识别器
-        detector = new GestureDetector(MainActivity.getContext(), new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                scrollTo((int) distanceX + getScrollX(), 0);
-                //mMoveDrawRun.run();
-                return true;
-            }
-        });
-
-    }
-
     //重写scrollTo方法防止滑动过度
     @Override
     public void scrollTo(int x, int y) {
@@ -481,36 +485,28 @@ public class MyDiagram extends ViewGroup {
             post(this);
 
         }
-
         @Override
         public void run() {
-
             // 如果已经结束，就不再进行
             if (!mScroller.computeScrollOffset()) {
                 return;
             }
-
             // 计算偏移量
             int currX = mScroller.getCurrX();
             int diffX = mInitX - currX;
-
             // 用于记录是否超出边界，如果已经超出边界，则不再进行回调，即使滚动还没有完成
             boolean isEnd = false;
-
             if (diffX != 0) {
-
                 // 超出右边界，进行修正
                 if (getScrollX() + diffX >= (viewWidth) * size) {
                     diffX = (int) ((viewWidth) * size - getScrollX());
                     isEnd = true;
                 }
-
                 // 超出左边界，进行修正
                 if (getScrollX() + diffX <= 0) {
                     diffX = 0 - getScrollX();
                     isEnd = true;
                 }
-
                 if (!mScroller.isFinished()) {
                     scrollBy(diffX, 0);
                 }
@@ -526,7 +522,6 @@ public class MyDiagram extends ViewGroup {
                 isFlinging = false;
             }
         }
-
         /**
          * 进行停止
          */
@@ -535,10 +530,7 @@ public class MyDiagram extends ViewGroup {
                 mScroller.abortAnimation();
             }
         }
-
     }
-
-    private int size = 1;
 
     /**
      * weather转化成point的方法
