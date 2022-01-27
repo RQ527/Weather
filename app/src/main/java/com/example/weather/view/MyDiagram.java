@@ -92,7 +92,7 @@ public class MyDiagram extends ViewGroup {
             curvePath.cubicTo((points.get(i).x + points.get(i + 1).x) / 2,
                     points.get(i).y,
                     (points.get(i).x + points.get(i + 1).x) / 2,
-                    points.get(i + 1).y, (float) (points.get(i + 1).x+0.1), points.get(i + 1).y);
+                    points.get(i + 1).y, (float) (points.get(i + 1).x + 0.1), points.get(i + 1).y);
         }
 
         dottedPath = new Path();
@@ -149,6 +149,11 @@ public class MyDiagram extends ViewGroup {
                             "null", "null", "null", "null", "null",
                             "null", "null", "null"), 0, "null", 0);
         }
+        //添加天气视图
+        for (int i = 0; i < size; i++) {
+            view = LayoutInflater.from(MainActivity.getContext()).inflate(R.layout.item_mydaigram, null);
+            addView(view);
+        }
         //将weather的温度转化成点。
         points = weatherToPoint(weather);
     }
@@ -162,11 +167,7 @@ public class MyDiagram extends ViewGroup {
         mScroller = new Scroller(MainActivity.getContext());
         screenWidth = getScreenWidth();
         viewWidth = (int) (screenWidth / 5.0);
-        //添加天气视图
-        for (int i = 0; i < 12; i++) {
-            view = LayoutInflater.from(MainActivity.getContext()).inflate(R.layout.item_mydaigram, null);
-            addView(view);
-        }
+
         //初始化手势识别器
         detector = new GestureDetector(MainActivity.getContext(), new GestureDetector.SimpleOnGestureListener() {
             @Override
@@ -185,8 +186,8 @@ public class MyDiagram extends ViewGroup {
         if (x <= 0) {
             x = 0;
         }
-        if (x >= (viewWidth) * 7) {
-            x = (viewWidth) * 7;
+        if (x >= (viewWidth) * (size - 5)) {
+            x = (viewWidth) * (size - 5);
         }
         super.scrollTo(x, y);
     }
@@ -242,7 +243,7 @@ public class MyDiagram extends ViewGroup {
         scaleX = (viewWidth) / (float) view.getMeasuredWidth();
         scaleY = (height / 2) / (float) view.getMeasuredHeight();
 
-        setMeasuredDimension(12 * (viewWidth), height);
+        setMeasuredDimension(size * (viewWidth), height);
         //因为初始化weather需要height,而height在上面才初始化完成所以放在这。
         initWeather();
         //path也是一样
@@ -292,23 +293,23 @@ public class MyDiagram extends ViewGroup {
         public void run() {
             linePath.reset();//重置路径
             //圆环的位置有两种情况，在前面一直在屏幕左方固定位置，在最后面可以通过点击来调整圆环的位置，所以分成了两种情况：
-            if (getScrollX() >= (viewWidth * 7)) {
+            if (getScrollX() >= (viewWidth * (size - 5))) {
                 // 绘制垂直线与曲线取交集
                 linePath.moveTo(drawX, 0F);
                 linePath.lineTo(drawX, (height / 2));
 
                 // 这里就直接取一个底为0.1，高为控件高度的三角形
                 linePath.lineTo((float) (drawX + 0.01), (height / 2));
-                linePath.lineTo((float) (drawX+0.01),0);
-            } else if (getScrollX() < (viewWidth * 7)) {
+                linePath.lineTo((float) (drawX + 0.01), 0);
+            } else if (getScrollX() < (viewWidth * (size - 5))) {
                 // 绘制垂直线与曲线取交集
 
                 linePath.moveTo((float) (getScrollX() + viewWidth / 2.0), 0F);
                 linePath.lineTo((float) (getScrollX() + viewWidth / 2.0), height / 2);
 
                 // 这里就直接取一个底为 0.1，高为控件高度的三角形
-                linePath.lineTo((float) (getScrollX() + viewWidth/2.0 + 0.01), height/2);
-                linePath.lineTo((float) (getScrollX() + viewWidth/2.0 + 0.01),0);
+                linePath.lineTo((float) (getScrollX() + viewWidth / 2.0 + 0.01), height / 2);
+                linePath.lineTo((float) (getScrollX() + viewWidth / 2.0 + 0.01), 0);
                 drawX = (float) (getScrollX() + viewWidth / 2.0);
             }
             linePath.close();
@@ -318,9 +319,9 @@ public class MyDiagram extends ViewGroup {
             // 取完交集后使用下面这个得到包裹它的矩形
             linePath.computeBounds(rect, false);
 
-            if (getScrollX() < (viewWidth * 7)&&rect.top != 0) {
+            if (getScrollX() < (viewWidth * (size - 5)) && rect.top != 0) {
                 drawY = rect.top; // 矩形的  top 就是圆心 y
-            }else if (getScrollX() >= (viewWidth * 7)&&rect.bottom!=0){
+            } else if (getScrollX() >= (viewWidth * (size - 5)) && rect.bottom != 0) {
                 drawY = rect.bottom; // 矩形的  bottom 就是圆心 y
             }
 
@@ -354,8 +355,8 @@ public class MyDiagram extends ViewGroup {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 //对应圆环位于后面的情况
-                if (getScrollX() >= 7 * viewWidth) {
-                    if ((getScrollX() + event.getX()) > 11.5 * viewWidth) {
+                if (getScrollX() >= (size - 5) * viewWidth) {
+                    if ((getScrollX() + event.getX()) > (size - 0.5) * viewWidth) {
                         drawX = getScrollX() + (float) 4.5 * viewWidth;
                     } else {
                         drawX = getScrollX() + event.getX();
@@ -368,8 +369,8 @@ public class MyDiagram extends ViewGroup {
                 break;
             case MotionEvent.ACTION_MOVE:
                 //对应圆环位于后面的情况
-                if (getScrollX() >= 7 * viewWidth) {
-                    if ((getScrollX() + event.getX()) > 11.5 * viewWidth) {
+                if (getScrollX() >= (size - 5) * viewWidth) {
+                    if ((getScrollX() + event.getX()) > (size - 0.5) * viewWidth) {
                         drawX = getScrollX() + (float) 4.5 * viewWidth;
                     } else {
                         drawX = getScrollX() + event.getX();
@@ -378,7 +379,7 @@ public class MyDiagram extends ViewGroup {
                 break;
             case MotionEvent.ACTION_UP:
                 //对应圆环位于后面的情况
-                if (getScrollX() >= 7 * viewWidth) {
+                if (getScrollX() >= (size - 5) * viewWidth) {
                     drawX = (float) (getScrollX() + viewWidth / 2.0);
                 }
                 //测量1秒的滑动速度
@@ -406,7 +407,7 @@ public class MyDiagram extends ViewGroup {
                 removeCallbacks(mMoveDrawRun);// 抬手或被父布局拦截时关闭 mMoveDrawRun
                 break;
             default:
-                throw new IllegalStateException("Unexpected value: " + event.getAction());
+
         }
         return true;
     }
@@ -499,8 +500,8 @@ public class MyDiagram extends ViewGroup {
             if (diffX != 0) {
 
                 // 超出右边界，进行修正
-                if (getScrollX() + diffX >= (viewWidth) * 12) {
-                    diffX = (int) ((viewWidth) * 12 - getScrollX());
+                if (getScrollX() + diffX >= (viewWidth) * size) {
+                    diffX = (int) ((viewWidth) * size - getScrollX());
                     isEnd = true;
                 }
 
@@ -537,6 +538,8 @@ public class MyDiagram extends ViewGroup {
 
     }
 
+    private int size = 1;
+
     /**
      * weather转化成point的方法
      *
@@ -550,6 +553,7 @@ public class MyDiagram extends ViewGroup {
         List<Point> points = new ArrayList<Point>();
         //获取hours的集合
         List<Weather.Data.Hour> hours = weather.getData().getHour();
+        size = hours.size();
         //获取最小温度
         minTemp = Integer.parseInt(hours.get(0).getTemp());
         //找出最小温度
