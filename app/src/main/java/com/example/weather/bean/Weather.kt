@@ -2,6 +2,7 @@ package com.example.weather.bean
 
 import androidx.room.*
 import com.example.weather.room.MyConverters
+import java.io.Serializable
 
 /**
  * ...
@@ -28,7 +29,7 @@ data class Weather(
     val msg: String,
     @ColumnInfo(name = "time")
     val time: Int
-) {
+):Serializable {
 
     data class Data(
         val air: String,
@@ -59,7 +60,7 @@ data class Weather(
         val wind: String,
         val wind_scale: String,
         val wind_speed: String
-    ) {
+    ):Serializable {
 
 
         data class Aqi(
@@ -72,7 +73,7 @@ data class Weather(
             val pm10: String,
             val pm25: String,
             val so2: String
-        )
+        ):Serializable
 
         data class Hour(
             val temp: String,
@@ -81,7 +82,7 @@ data class Weather(
             val wea_code: String,
             val wind: String,
             val wind_level: String
-        )
+        ):Serializable
 
         data class Index(
             val chuangyi: Chuangyi,
@@ -90,42 +91,42 @@ data class Weather(
             val xiche: Xiche,
             val yundong: Yundong,
             val ziwaixian: Ziwaixian
-        ) {
+        ):Serializable {
             data class Chuangyi(
                 val content: String,
                 val level: String,
                 val name: String
-            )
+            ):Serializable
 
             data class Ganmao(
                 val content: String,
                 val level: String,
                 val name: String
-            )
+            ):Serializable
 
             data class Huazhuang(
                 val content: String,
                 val level: String,
                 val name: String
-            )
+            ):Serializable
 
             data class Xiche(
                 val content: String,
                 val level: String,
                 val name: String
-            )
+            ):Serializable
 
             data class Yundong(
                 val content: String,
                 val level: String,
                 val name: String
-            )
+            ):Serializable
 
             data class Ziwaixian(
                 val content: String,
                 val level: String,
                 val name: String
-            )
+            ):Serializable
         }
     }
 

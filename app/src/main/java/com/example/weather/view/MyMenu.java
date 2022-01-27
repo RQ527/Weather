@@ -95,6 +95,7 @@ public class MyMenu extends View implements View.OnClickListener{
         }
 
         setMeasuredDimension(width,height);
+
     }
 
     @Override

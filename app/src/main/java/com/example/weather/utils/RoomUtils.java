@@ -38,6 +38,7 @@ public class RoomUtils {
         new DeleteWeatherTask(weatherDao,city).execute();
     }
 
+
     /**
      * 查询数据的方法
      * @param dispose 回调查询结果的接口实例
@@ -48,6 +49,12 @@ public class RoomUtils {
         new GetWeatherTask(weatherDao, city, dispose).execute();
     }
 
+    /**
+     * 查询所有数据的方法
+     * @param dispose 回调查询结果的接口实例
+     * @param weatherDao 用于操作Room的Dao对象
+     *
+     */
     public static void queryAll(IDispose dispose,WeatherDao weatherDao){
         new GetAllWeathersTask(weatherDao,dispose).execute();
     }
