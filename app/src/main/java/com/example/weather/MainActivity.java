@@ -101,10 +101,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button:
-
-                RoomUtils.delete(weatherDao,"拉萨");
+                RoomUtils.delete(weatherDao,"哈尔滨");
                 break;
-
         }
     }
 

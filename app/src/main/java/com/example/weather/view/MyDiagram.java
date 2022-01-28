@@ -10,6 +10,7 @@ import android.graphics.Point;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -107,7 +108,7 @@ public class MyDiagram extends ViewGroup {
     public void initPath() {
         curvePath = new Path();
         //这里面减0.1是为了防止误差画圆环找不到圆心，具体看画圆心的原理。
-        curvePath.moveTo((float) (points.get(0).x - 0.5), points.get(0).y);
+        curvePath.moveTo((float) (points.get(0).x - 1), points.get(0).y);
         //遍历点集合画曲线
         for (int i = 0; i < points.size() - 1; i++) {
             curvePath.cubicTo((points.get(i).x + points.get(i + 1).x) / 2,
@@ -299,21 +300,21 @@ public class MyDiagram extends ViewGroup {
             //圆环的位置有两种情况，在前面一直在屏幕左方固定位置，在最后面可以通过点击来调整圆环的位置，所以分成了两种情况：
             if (getScrollX() >= (viewWidth * (size - 5))) {
                 // 绘制垂直线与曲线取交集
-                linePath.moveTo(drawX, 0F);
-                linePath.lineTo(drawX, (height / 2));
+                linePath.moveTo(drawX, 0);
+                linePath.lineTo(drawX, (height / 2)+10);
 
-                // 这里就直接取一个底为0.1，高为控件高度的三角形
-                linePath.lineTo((float) (drawX + 0.01), (height / 2));
-                linePath.lineTo((float) (drawX + 0.01), 0);
+                // 这里就直接取一个底为1，高为控件高度的矩形
+                linePath.lineTo((float) (drawX + 1), (height / 2)+10);
+                linePath.lineTo((float) (drawX + 1), 0);
             } else if (getScrollX() < (viewWidth * (size - 5))) {
                 // 绘制垂直线与曲线取交集
 
-                linePath.moveTo((float) (getScrollX() + viewWidth / 2.0), 0F);
-                linePath.lineTo((float) (getScrollX() + viewWidth / 2.0), height / 2);
+                linePath.moveTo((float) (getScrollX() + viewWidth / 2.0), 0);
+                linePath.lineTo((float) (getScrollX() + viewWidth / 2.0), (height / 2)+10);
 
-                // 这里就直接取一个底为 0.1，高为控件高度的三角形
-                linePath.lineTo((float) (getScrollX() + viewWidth / 2.0 + 0.01), height / 2);
-                linePath.lineTo((float) (getScrollX() + viewWidth / 2.0 + 0.01), 0);
+                // 这里就直接取一个底为 1，高为控件高度的矩形
+                linePath.lineTo((float) (getScrollX() + viewWidth / 2.0 + 1), (height / 2)+10);
+                linePath.lineTo((float) (getScrollX() + viewWidth / 2.0 + 1), 0);
                 drawX = (float) (getScrollX() + viewWidth / 2.0);
             }
             linePath.close();
@@ -322,12 +323,15 @@ public class MyDiagram extends ViewGroup {
 
             // 取完交集后使用下面这个得到包裹它的矩形
             linePath.computeBounds(rect, false);
+            Log.d(TAG, "run: r:"+rect.right);
+            Log.d(TAG, "run: l:"+rect.left);
 
-            if (getScrollX() < (viewWidth * (size - 5)) && rect.top != 0) {
-                drawY = rect.top; // 矩形的  top 就是圆心 y
-            } else if (getScrollX() >= (viewWidth * (size - 5)) && rect.bottom != 0) {
-                drawY = rect.bottom; // 矩形的  bottom 就是圆心 y
-            }
+                if (rect.top==0){
+                    //为零就让其在底部
+                    drawY=height/2;
+                }else {
+                    drawY = rect.top; // 矩形的  top 就是圆心 y
+                }
 
             //这里更新的方法用的是郭神的思路，感谢郭神!!!
             invalidate(); // 通知重绘，为什么放这里而不放在 onTouchEvent 中？原因看下面注释
@@ -361,7 +365,7 @@ public class MyDiagram extends ViewGroup {
                 //对应圆环位于后面的情况
                 if (getScrollX() >= (size - 5) * viewWidth) {
                     if ((getScrollX() + event.getX()) > (size - 0.5) * viewWidth) {
-                        drawX = getScrollX() + (float) 4.5 * viewWidth;
+                        drawX = getScrollX() + (float) 4.5 * viewWidth-1;
                     } else {
                         drawX = getScrollX() + event.getX();
                     }
@@ -375,7 +379,7 @@ public class MyDiagram extends ViewGroup {
                 //对应圆环位于后面的情况
                 if (getScrollX() >= (size - 5) * viewWidth) {
                     if ((getScrollX() + event.getX()) > (size - 0.5) * viewWidth) {
-                        drawX = getScrollX() + (float) 4.5 * viewWidth;
+                        drawX = getScrollX() + (float) 4.5 * viewWidth-1;
                     } else {
                         drawX = getScrollX() + event.getX();
                     }
@@ -395,7 +399,7 @@ public class MyDiagram extends ViewGroup {
                     //从当前位置开始滑动
                     int initX = getScrollX();
                     //最大滑动距离为控件宽度
-                    int maxX = (viewWidth) * 12;
+                    int maxX = (viewWidth) * size;
 
                     if (maxX > 0) {
                         isFlinging = true;
