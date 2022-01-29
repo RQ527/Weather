@@ -96,7 +96,6 @@ public class AddWeatherActivity extends AppCompatActivity implements View.OnClic
             if (weather != null) {
                 RoomUtils.insert(weatherDao, weather);
                 Intent intent = new Intent(AddWeatherActivity.this, MainActivity.class);
-                intent.putExtra("weather", weather);
                 startActivity(intent);
                 finish();
             }

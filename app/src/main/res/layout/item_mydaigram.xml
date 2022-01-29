@@ -7,24 +7,24 @@
     android:orientation="vertical">
 
     <ImageView
-        android:id="@+id/imageView5"
+        android:id="@+id/iv_weather"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:src="@drawable/test"
-        android:padding="50dp"
+        android:padding="100dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/tv_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="测试"
-        android:textSize="35sp"
+        android:textSize="50sp"
         app:layout_constraintEnd_toEndOf="@+id/imageView6"
         app:layout_constraintHorizontal_bias="0.508"
         app:layout_constraintStart_toStartOf="@+id/imageView6"
@@ -37,19 +37,19 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:src="@drawable/time"
-        android:padding="50dp"
+        android:padding="100dp"
         app:layout_constraintEnd_toEndOf="@+id/imageView4"
         app:layout_constraintStart_toStartOf="@+id/imageView4"
-        app:layout_constraintTop_toBottomOf="@+id/textView4"
+        app:layout_constraintTop_toBottomOf="@+id/tv_fan"
         tools:ignore="MissingConstraints" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/tv_fan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="测试"
-        android:textSize="35sp"
+        android:textSize="50sp"
         app:layout_constraintEnd_toEndOf="@+id/imageView4"
         app:layout_constraintStart_toStartOf="@+id/imageView4"
         app:layout_constraintTop_toBottomOf="@+id/imageView4"
@@ -60,24 +60,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:src="@drawable/test"
-        android:padding="50dp"
-        app:layout_constraintEnd_toEndOf="@+id/textView2"
-        app:layout_constraintStart_toStartOf="@+id/textView2"
-        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        android:src="@drawable/fan"
+        android:padding="100dp"
+        app:layout_constraintEnd_toEndOf="@+id/tv_weather"
+        app:layout_constraintStart_toStartOf="@+id/tv_weather"
+        app:layout_constraintTop_toBottomOf="@+id/tv_weather"
         tools:ignore="MissingConstraints" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/tv_weather"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="测试"
-        android:textSize="35sp"
-        app:layout_constraintEnd_toEndOf="@+id/imageView5"
+        android:textSize="50sp"
+        app:layout_constraintEnd_toEndOf="@+id/iv_weather"
         app:layout_constraintHorizontal_bias="0.491"
-        app:layout_constraintStart_toStartOf="@+id/imageView5"
-        app:layout_constraintTop_toBottomOf="@+id/imageView5"
+        app:layout_constraintStart_toStartOf="@+id/iv_weather"
+        app:layout_constraintTop_toBottomOf="@+id/iv_weather"
         tools:ignore="MissingConstraints" />
 
 

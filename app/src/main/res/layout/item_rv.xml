@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingVertical="20dp"
+    android:paddingHorizontal="20dp"
+    android:orientation="vertical">
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        app:cardBackgroundColor="@color/none"
+        app:cardElevation="10dp"
+        app:cardCornerRadius="35dp">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/sunny_bg2"></ImageView>
+
+        <TextView
+            android:id="@+id/tv_itemRv_city"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:layout_gravity="center_vertical"
+            android:text="酉阳"
+            android:textColor="@color/white"
+            android:textSize="35sp"/>
+        <TextView
+            android:id="@+id/tv_itemRv_temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="300dp"
+            android:layout_gravity="center_vertical"
+            android:text="-36"
+            android:textColor="@color/white"
+            android:textSize="35sp"/>
+
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>

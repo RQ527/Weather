@@ -11,7 +11,6 @@ import com.example.weather.room.MyDataBase;
 import com.example.weather.room.WeatherDao;
 import com.example.weather.utils.RoomUtils;
 
-import java.io.Serializable;
 import java.util.List;
 
 public class LoadingActivity extends AppCompatActivity {
@@ -41,8 +40,6 @@ public class LoadingActivity extends AppCompatActivity {
                     finish();
                 }else {
                     Intent intent = new Intent(LoadingActivity.this,MainActivity.class);
-                    intent.putExtra("weathers", (Serializable) weathers);
-
                     startActivity(intent);
                     finish();
                 }

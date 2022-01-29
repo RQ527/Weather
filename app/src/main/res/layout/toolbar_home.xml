@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     >
     <Button
+        android:id="@+id/bt_toolbar_city"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:background="@drawable/city"

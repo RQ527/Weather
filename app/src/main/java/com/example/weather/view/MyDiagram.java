@@ -10,7 +10,6 @@ import android.graphics.Point;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -19,13 +18,17 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.Scroller;
+import android.widget.TextView;
 
 import androidx.core.view.ViewCompat;
 
 import com.example.weather.MainActivity;
 import com.example.weather.R;
 import com.example.weather.bean.Weather;
+import com.example.weather.utils.SelectUtils;
+import com.example.weather.utils.TimeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -177,14 +180,12 @@ public class MyDiagram extends ViewGroup {
                             "null", "null", "null", "null", "null",
                             "null", "null", "null"), 0, "null", 0);
         }
-        //添加天气视图
-        for (int i = 0; i < size; i++) {
-            view = LayoutInflater.from(MainActivity.getContext()).inflate(R.layout.item_mydaigram, null);
-            addView(view);
-        }
+        //添加视图之前删除假数据。
+
         //将weather的温度转化成点。
         points = weatherToPoint(weather);
     }
+
     //重写scrollTo方法防止滑动过度
     @Override
     public void scrollTo(int x, int y) {
@@ -234,11 +235,66 @@ public class MyDiagram extends ViewGroup {
         return displayMetrics.widthPixels;
     }
 
+    /**
+     * 添加天气视图的方法。
+     */
+    private void insertView() {
+        List<Weather.Data.Hour> hours = weather.getData().getHour();//获取的时间集合
+        Weather.Data.Hour hour;//用来存储小时天气
+        String wea;//天气状况
+        String time;//时间
+        TextView timeTextView;//展示时间的控件
+        ImageView weatherImageView;//展示天气的控件
+        TextView weatherTextview;//展示天气的TextView
+        TextView fanTextView;//展示风力的TextView
+        String wind;//风力
+        int weatherPicture;//天气图片ID
+        int minuteTime;//时间（分钟）
+        int sunrise = TimeUtils.TimeToMinutes(weather.getData().getSunrise());//日出时间（分钟）
+        int sunset = TimeUtils.TimeToMinutes(weather.getData().getSunset());//日落时间（分钟）
+        String when = "晚上";//白天还是晚上
+        //添加天气视图
+        for (int i = 0; i < size; i++) {
+            view = LayoutInflater.from(MainActivity.getContext()).inflate(R.layout.item_mydaigram, null);
+            hour = hours.get(i);
+            wea = hour.getWea();
+
+            time = hour.getTime();
+            minuteTime = TimeUtils.TimeToMinutes(time.substring(11, 16));
+
+            timeTextView = view.findViewById(R.id.tv_time);
+            timeTextView.setText(time.substring(11, 16));
+
+            //判断白天还是晚上用于设置不同的视图
+            if (minuteTime >= sunrise && minuteTime <= sunset) {
+                when = "白天";
+            }
+            weatherPicture = SelectUtils.selectWeatherPicture(wea, when);
+            weatherImageView = view.findViewById(R.id.iv_weather);
+            weatherImageView.setImageResource(weatherPicture);
+
+            weatherTextview = view.findViewById(R.id.tv_weather);
+            weatherTextview.setText(hour.getWea());
+
+            wind = hour.getWind_level();
+            fanTextView = view.findViewById(R.id.tv_fan);
+            fanTextView.setText(wind);
+
+            addView(view);
+        }
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         //获取控件高度
         height = getMySize(100, heightMeasureSpec);
+        //因为初始化weather需要height,而height在上面才初始化完成所以放在这。
+        initWeather();
+        //path也是一样
+        initPath();
+        //到这里数据加载完毕，添加视图。
+        insertView();
         //测量view
         for (int i = 0; i < getChildCount(); i++) {
             View childAt = getChildAt(i);
@@ -249,10 +305,6 @@ public class MyDiagram extends ViewGroup {
         scaleY = (height / 2) / (float) view.getMeasuredHeight();
 
         setMeasuredDimension(size * (viewWidth), height);
-        //因为初始化weather需要height,而height在上面才初始化完成所以放在这。
-        initWeather();
-        //path也是一样
-        initPath();
     }
 
     @Override
@@ -301,19 +353,19 @@ public class MyDiagram extends ViewGroup {
             if (getScrollX() >= (viewWidth * (size - 5))) {
                 // 绘制垂直线与曲线取交集
                 linePath.moveTo(drawX, 0);
-                linePath.lineTo(drawX, (height / 2)+10);
+                linePath.lineTo(drawX, (height / 2) + 10);
 
                 // 这里就直接取一个底为1，高为控件高度的矩形
-                linePath.lineTo((float) (drawX + 1), (height / 2)+10);
+                linePath.lineTo((float) (drawX + 1), (height / 2) + 10);
                 linePath.lineTo((float) (drawX + 1), 0);
             } else if (getScrollX() < (viewWidth * (size - 5))) {
                 // 绘制垂直线与曲线取交集
 
                 linePath.moveTo((float) (getScrollX() + viewWidth / 2.0), 0);
-                linePath.lineTo((float) (getScrollX() + viewWidth / 2.0), (height / 2)+10);
+                linePath.lineTo((float) (getScrollX() + viewWidth / 2.0), (height / 2) + 10);
 
                 // 这里就直接取一个底为 1，高为控件高度的矩形
-                linePath.lineTo((float) (getScrollX() + viewWidth / 2.0 + 1), (height / 2)+10);
+                linePath.lineTo((float) (getScrollX() + viewWidth / 2.0 + 1), (height / 2) + 10);
                 linePath.lineTo((float) (getScrollX() + viewWidth / 2.0 + 1), 0);
                 drawX = (float) (getScrollX() + viewWidth / 2.0);
             }
@@ -323,15 +375,13 @@ public class MyDiagram extends ViewGroup {
 
             // 取完交集后使用下面这个得到包裹它的矩形
             linePath.computeBounds(rect, false);
-            Log.d(TAG, "run: r:"+rect.right);
-            Log.d(TAG, "run: l:"+rect.left);
 
-                if (rect.top==0){
-                    //为零就让其在底部
-                    drawY=height/2;
-                }else {
-                    drawY = rect.top; // 矩形的  top 就是圆心 y
-                }
+            if (rect.top == 0) {
+                //为零就让其在底部
+                drawY = height / 2;
+            } else {
+                drawY = rect.top; // 矩形的  top 就是圆心 y
+            }
 
             //这里更新的方法用的是郭神的思路，感谢郭神!!!
             invalidate(); // 通知重绘，为什么放这里而不放在 onTouchEvent 中？原因看下面注释
@@ -365,7 +415,7 @@ public class MyDiagram extends ViewGroup {
                 //对应圆环位于后面的情况
                 if (getScrollX() >= (size - 5) * viewWidth) {
                     if ((getScrollX() + event.getX()) > (size - 0.5) * viewWidth) {
-                        drawX = getScrollX() + (float) 4.5 * viewWidth-1;
+                        drawX = getScrollX() + (float) 4.5 * viewWidth - 1;
                     } else {
                         drawX = getScrollX() + event.getX();
                     }
@@ -379,7 +429,7 @@ public class MyDiagram extends ViewGroup {
                 //对应圆环位于后面的情况
                 if (getScrollX() >= (size - 5) * viewWidth) {
                     if ((getScrollX() + event.getX()) > (size - 0.5) * viewWidth) {
-                        drawX = getScrollX() + (float) 4.5 * viewWidth-1;
+                        drawX = getScrollX() + (float) 4.5 * viewWidth - 1;
                     } else {
                         drawX = getScrollX() + event.getX();
                     }
@@ -489,6 +539,7 @@ public class MyDiagram extends ViewGroup {
             post(this);
 
         }
+
         @Override
         public void run() {
             // 如果已经结束，就不再进行
@@ -526,6 +577,7 @@ public class MyDiagram extends ViewGroup {
                 isFlinging = false;
             }
         }
+
         /**
          * 进行停止
          */
