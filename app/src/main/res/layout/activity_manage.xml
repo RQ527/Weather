@@ -5,35 +5,45 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ManageActivity">
+
     <androidx.appcompat.widget.Toolbar
+        android:id="@+id/tb_manageActivity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        app:layout_constraintTop_toTopOf="parent"
         app:title=""
-        tools:ignore="MissingConstraints">
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="0dp">
+
         <Button
             android:id="@+id/bt_toolbar_back"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/back"/>
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/back" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:text="城市管理"
-            android:textSize="25sp"
-            android:layout_gravity="center_horizontal"/>
+            android:textSize="20sp" />
+
         <Button
             android:id="@+id/bt_toolbar_addCity"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_gravity="right"
             android:layout_marginRight="20dp"
-            android:background="@drawable/add"/>
+            android:background="@drawable/add" />
 
     </androidx.appcompat.widget.Toolbar>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_manageActivity_city"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/tb_manageActivity"
         tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

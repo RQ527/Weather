@@ -9,8 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.weather.base.BaseActivity;
 import com.example.weather.bean.Weather;
 import com.example.weather.room.MyDataBase;
 import com.example.weather.room.WeatherDao;
@@ -24,7 +24,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-public class AddWeatherActivity extends AppCompatActivity implements View.OnClickListener {
+public class AddWeatherActivity extends BaseActivity implements View.OnClickListener {
     private EditText mEditText;
     private Button mButton;
     private MyHandler mHandler;

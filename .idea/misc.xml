@@ -3,15 +3,16 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/drawable/background_gradient.xml" value="0.26564102564102565" />
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/drawable/shape_popupwindow.xml" value="0.26979166666666665" />
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/activity_add_weather.xml" value="0.21875" />
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/activity_loading.xml" value="0.213768115942029" />
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/activity_main.xml" value="0.17300724637681159" />
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/activity_manage.xml" value="0.20018115942028986" />
-        <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/fragment_home.xml" value="0.2" />
+        <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/fragment_home.xml" value="0.176" />
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/item_listview.xml" value="0.21829710144927536" />
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/item_menu.xml" value="0.16530797101449277" />
-        <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/item_mydaigram.xml" value="0.2" />
+        <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/item_mydaigram.xml" value="0.1" />
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/item_rv.xml" value="0.264" />
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/menuitem_home.xml" value="0.22327898550724637" />
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/popupwindow_list.xml" value="0.21829710144927536" />

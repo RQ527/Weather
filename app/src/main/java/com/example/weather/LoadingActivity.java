@@ -3,8 +3,7 @@ package com.example.weather;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import com.example.weather.base.BaseActivity;
 import com.example.weather.bean.Weather;
 import com.example.weather.room.IDispose;
 import com.example.weather.room.MyDataBase;
@@ -13,7 +12,7 @@ import com.example.weather.utils.RoomUtils;
 
 import java.util.List;
 
-public class LoadingActivity extends AppCompatActivity {
+public class LoadingActivity extends BaseActivity {
 
     private static final String TAG = "RQ";
     private MyDataBase myDataBase;

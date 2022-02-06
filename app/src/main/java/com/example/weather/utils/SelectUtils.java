@@ -32,7 +32,7 @@ public class SelectUtils {
             case "中雨":
             case "小雨":
             case "暴雨":
-                return R.drawable.runny;
+                return R.drawable.rainy;
             case "霾":
                 return R.drawable.haze;
             case "雾":
@@ -55,27 +55,25 @@ public class SelectUtils {
                 if (when.equals("白天")) return R.drawable.sunny_bg1;
                 if (when.equals("晚上")) return R.drawable.sunny_bg2;
             case "阴":
-                return R.drawable.cloudy_bg;
+                return R.drawable.overcast_bg;
             case "多云":
-
-                break;
+                return R.drawable.cloudy_bg;
             case "大雨":
             case "中雨":
             case "小雨":
             case "暴雨":
-                return R.drawable.runny;
+                return R.drawable.rainy_bg;
             case "霾":
-                return R.drawable.haze;
+                return R.drawable.haze_bg;
             case "雾":
-                return R.drawable.fog;
+                return R.drawable.fog_bg;
             case "雨夹雪":
-                return R.drawable.sleet;
             case "小雪":
             case "中雪":
             case "大雪":
             case "暴雪":
-                return R.drawable.snowy;
+                return R.drawable.snowy_bg;
         }
-        return R.drawable.cloudy_bg;
+        return R.drawable.overcast_bg;
     }
 }

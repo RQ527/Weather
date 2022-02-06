@@ -9,5 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="none">#00000000</color>
     <color name="skyBlue">#87ceeb</color>
-    <color name="gray">#dcdcdc</color>
+    <color name="blue">#6699FF</color>1
+    <color name="gray">#1E1E1E</color>
+    <color name="navyBlue">#27408B</color>
 </resources>

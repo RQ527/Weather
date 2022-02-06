@@ -52,22 +52,16 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
             super(itemView);
             cityTextView = itemView.findViewById(R.id.tv_itemRv_city);
             tempTextView = itemView.findViewById(R.id.tv_itemRv_temp);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mOnItemClickListener!=null){
-                        mOnItemClickListener.onRecyclerItemClick(getAdapterPosition());
-                    }
+            itemView.setOnClickListener(v -> {
+                if (mOnItemClickListener!=null){
+                    mOnItemClickListener.onRecyclerItemClick(getAdapterPosition(),itemView);
                 }
             });
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    if (mOnItemClickListener!=null){
-                        mOnItemClickListener.onRecyclerItemLongClick(getAdapterPosition());
-                    }
-                    return true;
+            itemView.setOnLongClickListener(v -> {
+                if (mOnItemClickListener!=null){
+                    mOnItemClickListener.onRecyclerItemLongClick(getAdapterPosition(),itemView);
                 }
+                return true;
             });
         }
     }
@@ -79,8 +73,8 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
     }
 
     public interface onRecyclerItemClickListener{
-        void onRecyclerItemClick(int position);
+        void onRecyclerItemClick(int position,View view);
 
-        void onRecyclerItemLongClick(int position);
+        void onRecyclerItemLongClick(int position,View view);
     }
 }

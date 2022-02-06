@@ -98,7 +98,10 @@ public class MyDiagram extends ViewGroup {
             @Override
             public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
                 scrollTo((int) distanceX + getScrollX(), 0);
-                //mMoveDrawRun.run();
+                //反拦截，处理于viewpage2的滑动冲突
+                if (Math.abs(distanceX) >= Math.abs(distanceY)||Math.abs(distanceY)<8) {
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                }
                 return true;
             }
         });
@@ -158,7 +161,7 @@ public class MyDiagram extends ViewGroup {
     public void initWeather() {
         //防止weather为空，因此设置了假数据,也是累死了.
         if (weather == null) {
-            List<Weather.Data.Hour> hours = new ArrayList<Weather.Data.Hour>();
+            List<Weather.Data.Hour> hours = new ArrayList<>();
             Weather.Data.Hour hour = new Weather.Data.Hour("0", "null", "null", "null",
                     "null", "null");
             hours.add(hour);
@@ -262,8 +265,6 @@ public class MyDiagram extends ViewGroup {
             time = hour.getTime();
             minuteTime = TimeUtils.TimeToMinutes(time.substring(11, 16));
 
-            timeTextView = view.findViewById(R.id.tv_time);
-            timeTextView.setText(time.substring(11, 16));
 
             //判断白天还是晚上用于设置不同的视图
             if (minuteTime >= sunrise && minuteTime <= sunset) {
@@ -273,12 +274,21 @@ public class MyDiagram extends ViewGroup {
             weatherImageView = view.findViewById(R.id.iv_weather);
             weatherImageView.setImageResource(weatherPicture);
 
+            timeTextView = view.findViewById(R.id.tv_time);
+            timeTextView.setText(time.substring(11, 16));
+
             weatherTextview = view.findViewById(R.id.tv_weather);
             weatherTextview.setText(hour.getWea());
 
             wind = hour.getWind_level();
             fanTextView = view.findViewById(R.id.tv_fan);
             fanTextView.setText(wind);
+            //适应字体颜色
+            if (when.equals("晚上")){
+                weatherTextview.setTextColor(Color.WHITE);
+                fanTextView.setTextColor(Color.WHITE);
+                timeTextView.setTextColor(Color.WHITE);
+            }
 
             addView(view);
         }
