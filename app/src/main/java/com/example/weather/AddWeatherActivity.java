@@ -95,8 +95,20 @@ public class AddWeatherActivity extends BaseActivity implements View.OnClickList
             weather.setCity(mEditText.getText().toString());
             if (weather != null) {
                 RoomUtils.insert(weatherDao, weather);
-                Intent intent = new Intent(AddWeatherActivity.this, MainActivity.class);
-                startActivity(intent);
+                String flag = getIntent().getStringExtra("flag");
+                if (flag!=null){
+                    Intent intent;
+                    if (flag.equals("manage")){
+                        intent = new Intent(AddWeatherActivity.this, ManageActivity.class);
+                    }else {
+                        intent = new Intent(AddWeatherActivity.this, MainActivity.class);
+                    }
+                    startActivity(intent);
+                }else {
+                    Intent intent = new Intent(AddWeatherActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }
+
                 finish();
             }
         }

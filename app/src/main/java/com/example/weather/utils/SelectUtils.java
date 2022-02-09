@@ -63,6 +63,7 @@ public class SelectUtils {
             case "小雨":
             case "暴雨":
                 return R.drawable.rainy_bg;
+            case "雾霾":
             case "霾":
                 return R.drawable.haze_bg;
             case "雾":

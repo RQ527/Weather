@@ -22,5 +22,5 @@ public interface IDispose {
      * 如果查询的是多个weather方法则使用此方法
      * @param weathers
      */
-    void runOnUi(List<Weather> weathers);
+    void runOnUi(List<Weather> weathers) throws Exception;
 }

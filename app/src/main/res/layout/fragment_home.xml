@@ -7,13 +7,13 @@
     tools:context=".view.HomeFragment">
 
     <LinearLayout
-        android:id="@+id/ll_home_weatherBackground"
+        android:id="@+id/ll_fragment_weatherBackground"
         android:layout_width="match_parent"
         android:layout_height="500dp"
+        android:background="@drawable/sunny_bg1"
+        android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/rainy_bg"
-        tools:ignore="MissingConstraints"
-        android:orientation="vertical"/>
+        tools:ignore="MissingConstraints" />
 
     <com.example.weather.view.MyScrollView
         android:id="@+id/sc_fragment"
@@ -105,11 +105,11 @@
 
                 <TextView
                     android:id="@+id/tv_home_temp"
-                    android:layout_width="107dp"
-                    android:layout_height="123dp"
+                    android:layout_width="120dp"
+                    android:layout_height="117dp"
                     android:layout_marginTop="16dp"
                     android:gravity="center"
-                    android:text="2"
+                    android:text="-2"
                     android:textColor="@color/white"
                     android:textSize="100sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -136,7 +136,7 @@
                     android:layout_height="48dp"
                     android:layout_marginTop="16dp"
                     android:text="℃"
-                    android:textColor="@color/gray"
+                    android:textColor="@color/white"
                     android:textSize="30sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
@@ -163,7 +163,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="能见度"
-                    android:textColor="@color/gray"
+                    android:textColor="@color/white"
                     android:textSize="10sp"
                     app:layout_constraintBottom_toTopOf="@+id/tv_home_visibility"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -176,7 +176,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:text="8km"
-                    android:textColor="@color/gray"
+                    android:textColor="@color/white"
                     android:textSize="20sp"
                     app:layout_constraintBottom_toBottomOf="@+id/tv_home_temp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -205,6 +205,7 @@
                     app:layout_constraintVertical_bias="0.103">
 
                     <ImageView
+                        android:id="@+id/imageView2"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:padding="20dp"
@@ -212,72 +213,99 @@
                         tools:layout_editor_absoluteX="34dp"
                         tools:layout_editor_absoluteY="-46dp" />
 
-                    <ImageView
-                        android:id="@+id/iv_fragment_wind_direction"
-                        android:layout_width="42dp"
-                        android:layout_height="42dp"
-                        android:layout_marginTop="80dp"
-                        android:background="@drawable/wind_direction"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.714"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <ImageView
-                        android:id="@+id/iv_fragment_pressure"
-                        android:layout_width="42dp"
-                        android:layout_height="42dp"
-                        android:layout_marginTop="8dp"
-                        android:background="@drawable/pressure"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.932"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <ImageView
-                        android:id="@+id/iv_fragment_rays"
-                        android:layout_width="42dp"
-                        android:layout_height="42dp"
-                        android:layout_marginTop="90dp"
-                        android:background="@drawable/rays"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.143"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <ImageView
-                        android:id="@+id/iv_fragment_visibility"
-                        android:layout_width="42dp"
-                        android:layout_height="42dp"
-                        android:layout_marginBottom="30dp"
-                        android:background="@drawable/visibility"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.715"
-                        app:layout_constraintStart_toStartOf="parent" />
-
-                    <ImageView
-                        android:id="@+id/iv_fragment_humidity"
-                        android:layout_width="42dp"
-                        android:layout_height="42dp"
-                        android:layout_marginBottom="30dp"
-                        android:background="@drawable/humidity"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.271"
-                        app:layout_constraintStart_toStartOf="parent" />
-
-                    <TextView
-                        android:id="@+id/visibility"
+                    <LinearLayout
+                        android:id="@+id/ll_fragment_visibility"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="120dp"
-                        android:text="3级"
-                        android:textSize="10sp"
+                        android:layout_marginTop="80dp"
+                        android:orientation="vertical"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.681"
+                        app:layout_constraintHorizontal_bias="0.704"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="能见度" />
+
+                        <TextView
+                            android:id="@+id/tv_fragment_visibility"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="0km" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ll_fragment_wind"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="170dp"
+                        android:orientation="vertical"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.653"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:id="@+id/tv_fragment_windDirection"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="风向" />
+
+                        <TextView
+                            android:id="@+id/tv_fragment_windLevel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="风级" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ll_fragment_pressure"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="70dp"
+                        android:orientation="vertical"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.334"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="气压" />
+
+                        <TextView
+                            android:id="@+id/tv_fragment_pressure"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="1000hPa" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ll_fragment_humidity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="160dp"
+                        android:orientation="vertical"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.298"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="湿度" />
+
+                        <TextView
+                            android:id="@+id/tv_fragment_humidity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="98%" />
+                    </LinearLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

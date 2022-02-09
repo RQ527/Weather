@@ -10,6 +10,7 @@ import android.graphics.Point;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -242,55 +243,58 @@ public class MyDiagram extends ViewGroup {
      * 添加天气视图的方法。
      */
     private void insertView() {
-        List<Weather.Data.Hour> hours = weather.getData().getHour();//获取的时间集合
-        Weather.Data.Hour hour;//用来存储小时天气
-        String wea;//天气状况
-        String time;//时间
-        TextView timeTextView;//展示时间的控件
-        ImageView weatherImageView;//展示天气的控件
-        TextView weatherTextview;//展示天气的TextView
-        TextView fanTextView;//展示风力的TextView
-        String wind;//风力
-        int weatherPicture;//天气图片ID
-        int minuteTime;//时间（分钟）
-        int sunrise = TimeUtils.TimeToMinutes(weather.getData().getSunrise());//日出时间（分钟）
-        int sunset = TimeUtils.TimeToMinutes(weather.getData().getSunset());//日落时间（分钟）
-        String when = "晚上";//白天还是晚上
-        //添加天气视图
-        for (int i = 0; i < size; i++) {
-            view = LayoutInflater.from(MainActivity.getContext()).inflate(R.layout.item_mydaigram, null);
-            hour = hours.get(i);
-            wea = hour.getWea();
+        if (weather.getCode()!=0) {
+            List<Weather.Data.Hour> hours = weather.getData().getHour();//获取的时间集合
+            Weather.Data.Hour hour;//用来存储小时天气
+            String wea;//天气状况
+            String time;//时间
+            TextView timeTextView;//展示时间的控件
+            ImageView weatherImageView;//展示天气的控件
+            TextView weatherTextview;//展示天气的TextView
+            TextView fanTextView;//展示风力的TextView
+            String wind;//风力
+            int weatherPicture;//天气图片ID
+            int minuteTime;//时间（分钟）
+            Log.d(TAG, "insertView: " + weather.getData().getSunrise());
+            int sunrise = TimeUtils.TimeToMinutes(weather.getData().getSunrise());//日出时间（分钟）
+            int sunset = TimeUtils.TimeToMinutes(weather.getData().getSunset());//日落时间（分钟）
+            String when = "晚上";//白天还是晚上
+            //添加天气视图
+            for (int i = 0; i < size; i++) {
+                view = LayoutInflater.from(MainActivity.getContext()).inflate(R.layout.item_mydaigram, null);
+                hour = hours.get(i);
+                wea = hour.getWea();
 
-            time = hour.getTime();
-            minuteTime = TimeUtils.TimeToMinutes(time.substring(11, 16));
+                time = hour.getTime();
+                minuteTime = TimeUtils.TimeToMinutes(time.substring(11, 16));
 
 
-            //判断白天还是晚上用于设置不同的视图
-            if (minuteTime >= sunrise && minuteTime <= sunset) {
-                when = "白天";
+                //判断白天还是晚上用于设置不同的视图
+                if (minuteTime >= sunrise && minuteTime <= sunset) {
+                    when = "白天";
+                }
+                weatherPicture = SelectUtils.selectWeatherPicture(wea, when);
+                weatherImageView = view.findViewById(R.id.iv_weather);
+                weatherImageView.setImageResource(weatherPicture);
+
+                timeTextView = view.findViewById(R.id.tv_time);
+                timeTextView.setText(time.substring(11, 16));
+
+                weatherTextview = view.findViewById(R.id.tv_weather);
+                weatherTextview.setText(hour.getWea());
+
+                wind = hour.getWind_level();
+                fanTextView = view.findViewById(R.id.tv_fan);
+                fanTextView.setText(wind);
+                //适应字体颜色
+                if (when.equals("晚上")) {
+                    weatherTextview.setTextColor(Color.WHITE);
+                    fanTextView.setTextColor(Color.WHITE);
+                    timeTextView.setTextColor(Color.WHITE);
+                }
+
+                addView(view);
             }
-            weatherPicture = SelectUtils.selectWeatherPicture(wea, when);
-            weatherImageView = view.findViewById(R.id.iv_weather);
-            weatherImageView.setImageResource(weatherPicture);
-
-            timeTextView = view.findViewById(R.id.tv_time);
-            timeTextView.setText(time.substring(11, 16));
-
-            weatherTextview = view.findViewById(R.id.tv_weather);
-            weatherTextview.setText(hour.getWea());
-
-            wind = hour.getWind_level();
-            fanTextView = view.findViewById(R.id.tv_fan);
-            fanTextView.setText(wind);
-            //适应字体颜色
-            if (when.equals("晚上")){
-                weatherTextview.setTextColor(Color.WHITE);
-                fanTextView.setTextColor(Color.WHITE);
-                timeTextView.setTextColor(Color.WHITE);
-            }
-
-            addView(view);
         }
     }
 
@@ -310,10 +314,11 @@ public class MyDiagram extends ViewGroup {
             View childAt = getChildAt(i);
             childAt.measure(childAt.getMeasuredWidth(), childAt.getMeasuredHeight());
         }
-        //获取view缩放比率
-        scaleX = (viewWidth) / (float) view.getMeasuredWidth();
-        scaleY = (height / 2) / (float) view.getMeasuredHeight();
-
+        if (view!=null) {
+            //获取view缩放比率
+            scaleX = (viewWidth) / (float) view.getMeasuredWidth();
+            scaleY = (height / 2) / (float) view.getMeasuredHeight();
+        }
         setMeasuredDimension(size * (viewWidth), height);
     }
 
@@ -366,8 +371,8 @@ public class MyDiagram extends ViewGroup {
                 linePath.lineTo(drawX, (height / 2) + 10);
 
                 // 这里就直接取一个底为1，高为控件高度的矩形
-                linePath.lineTo((float) (drawX + 1), (height / 2) + 10);
-                linePath.lineTo((float) (drawX + 1), 0);
+                linePath.lineTo(drawX + 1, (height / 2) + 10);
+                linePath.lineTo(drawX + 1, 0);
             } else if (getScrollX() < (viewWidth * (size - 5))) {
                 // 绘制垂直线与曲线取交集
 
@@ -390,7 +395,7 @@ public class MyDiagram extends ViewGroup {
                 //为零就让其在底部
                 drawY = height / 2;
             } else {
-                drawY = rect.top; // 矩形的  top 就是圆心 y
+                drawY = rect.bottom; // 矩形的  bottom 就是圆心 y
             }
 
             //这里更新的方法用的是郭神的思路，感谢郭神!!!

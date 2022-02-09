@@ -24,25 +24,35 @@ public class LoadingActivity extends BaseActivity {
         setContentView(R.layout.activity_loading);
         myDataBase = MyDataBase.getInstance(this);
         weatherDao = myDataBase.getWeatherDao();
-
-        RoomUtils.queryAll(new IDispose() {
+        new Thread(new Runnable() {
             @Override
-            public void runOnUi(Weather weather) {
-
-            }
-
-            @Override
-            public void runOnUi(List<Weather> weathers) {
-                if (weathers.size()==0){
-                    Intent intent = new Intent(LoadingActivity.this,AddWeatherActivity.class);
-                    startActivity(intent);
-                    finish();
-                }else {
-                    Intent intent = new Intent(LoadingActivity.this,MainActivity.class);
-                    startActivity(intent);
-                    finish();
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+                RoomUtils.queryAll(new IDispose() {
+                    @Override
+                    public void runOnUi(Weather weather) {
+
+                    }
+
+                    @Override
+                    public void runOnUi(List<Weather> weathers) {
+                        if (weathers.size()==0){
+                            Intent intent = new Intent(LoadingActivity.this,AddWeatherActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }else {
+                            Intent intent = new Intent(LoadingActivity.this,MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    }
+                }, weatherDao);
             }
-        }, weatherDao);
+        }).start();
+
     }
 }

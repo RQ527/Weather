@@ -90,7 +90,11 @@ public class RoomUtils {
         @Override
         protected void onPostExecute(Void unused) {
             super.onPostExecute(unused);
-            dispose.runOnUi(weathers);
+            try {
+                dispose.runOnUi(weathers);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

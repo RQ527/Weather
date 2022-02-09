@@ -3,6 +3,7 @@ package com.example.weather;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,45 +33,47 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ManageActivity extends BaseActivity implements View.OnClickListener {
+    private static final String TAG = "RQ";
     private RecyclerView mRecyclerView;
     private WeatherDao weatherDao;
     private MyDataBase myDataBase;
-    private List<Weather> data;
+    private ArrayList<Weather> data;
     private Button backButton;
     private Button addButton;
+    private MyRecyclerAdapter recyclerAdapter;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage);
-
-
         initView();
-
         RoomUtils.queryAll(new IDispose() {
+
             @Override
             public void runOnUi(Weather weather) {
 
             }
-
             @Override
             public void runOnUi(List<Weather> weathers) {
-                if (weathers!=null) {
+                if (weathers != null) {
                     for (Weather weather : weathers) {
                         data.add(weather);
                     }
-                    MyRecyclerAdapter recyclerAdapter = new MyRecyclerAdapter(data,ManageActivity.this);
+                    recyclerAdapter = new MyRecyclerAdapter(data, ManageActivity.this);
                     recyclerAdapter.setRecyclerItemClickListener(new MyRecyclerAdapter.onRecyclerItemClickListener() {
                         @Override
-                        public void onRecyclerItemClick(int position,View view) {
-
+                        public void onRecyclerItemClick(int position, View view) {
+                            Intent intent = new Intent(ManageActivity.this,MainActivity.class);
+                            intent.putExtra("position",String.valueOf(position));
+                            startActivity(intent);
+                            finish();
                         }
 
                         @Override
-                        public void onRecyclerItemLongClick(int position,View view) {
+                        public void onRecyclerItemLongClick(int position, View view) {
                             Toast.makeText(ManageActivity.this, "长按", Toast.LENGTH_SHORT).show();
-                            openPopupWindow(view);
+                            openPopupWindow(view,position);
                         }
 
                     });
@@ -96,57 +99,87 @@ public class ManageActivity extends BaseActivity implements View.OnClickListener
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.bt_toolbar_back:
+                MainActivity.flag = 1;
                 finish();
                 break;
             case R.id.bt_toolbar_addCity:
-                Intent intent = new Intent(ManageActivity.this,AddWeatherActivity.class);
-                //startActivity(intent);
+                Intent intent2 = new Intent(ManageActivity.this, AddWeatherActivity.class);
+                intent2.putExtra("flag", "manage");
+                startActivity(intent2);
+                finish();
                 break;
         }
     }
+
     PopupWindow popupWindow;
-    //用popupWindow作为弹出的menu菜单
-    private void openPopupWindow(View mView){
+
+    //用popupWindow作为弹出的dialog
+    private void openPopupWindow(View mView,int mPosition) {
         //渲染
-        View view = LayoutInflater.from(MainActivity.getContext()).inflate(R.layout.popupwindow_list,null);
+        View view = LayoutInflater.from(MainActivity.getContext()).inflate(R.layout.popupwindow_list, null);
         ListView listView = view.findViewById(R.id.lt_popupWindow);
         //数据
-        final String[] data = {"删除"};
+        final String[] data2 = {"删除"};
         //让文本显示居中
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.getContext(), android.R.layout.simple_list_item_1,data){
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.getContext(), android.R.layout.simple_list_item_1, data2) {
             @NonNull
             @Override
             public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                TextView textView = (TextView) super.getView(position,convertView,parent);
+                TextView textView = (TextView) super.getView(position, convertView, parent);
                 textView.setGravity(Gravity.CENTER);
                 return textView;
             }
         };
         listView.setAdapter(adapter);
+        Log.d(TAG, "onItemClick: "+mPosition);
+        TextView city = mView.findViewById(R.id.tv_itemRv_city);
+        for (Weather weather:data){
+            if (weather.getCity().equals(city.getText().toString())){
+                //data.remove(weather);
+//                Log.d(TAG, "openPopupWindow: "+data.remove(weather));
+                //recyclerAdapter.notifyItemRemoved(mPosition);
+            }
+        }
         //设置点击事件
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                //点击反应
-                Toast.makeText(MainActivity.getContext(), data[position], Toast.LENGTH_SHORT).show();
+                TextView city = mView.findViewById(R.id.tv_itemRv_city);
+                for (Weather weather:data){
+                    if (weather.getCity().equals(city.getText().toString())){
+                        data.remove(weather);
+
+                        recyclerAdapter.notifyItemRemoved(mPosition);
+                        break;
+                    }
+                }
+                RoomUtils.delete(weatherDao, city.getText().toString());
+                if (data.size() == 0) {
+                    Intent intent = new Intent(ManageActivity.this, AddWeatherActivity.class);
+                    intent.putExtra("flag", "manage");
+                    startActivity(intent);
+                    finish();
+                }
+
                 //影藏弹窗
                 dismissPopupWindow();
             }
+
         });
 
         popupWindow = new PopupWindow(view, 250, ViewGroup.LayoutParams.WRAP_CONTENT);
         popupWindow.setBackgroundDrawable(new BitmapDrawable());
         popupWindow.setFocusable(true);
-        popupWindow.setAnimationStyle(R.style.mypopwindow_anim_style);
-        popupWindow.showAsDropDown(mView, 300, -100);
+        popupWindow.setAnimationStyle(R.style.mypopwindow2_anim_style);
+        popupWindow.showAsDropDown(mView, 300, -350);
 
     }
 
     private void dismissPopupWindow() {
-        if (popupWindow!=null&&popupWindow.isShowing()){
+        if (popupWindow != null && popupWindow.isShowing()) {
             popupWindow.dismiss();
             popupWindow = null;
         }

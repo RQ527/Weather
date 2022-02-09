@@ -10,6 +10,7 @@
         android:background="@drawable/city"
         android:layout_margin="20dp"/>
     <TextView
+        android:id="@+id/tv_toolbar_city"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

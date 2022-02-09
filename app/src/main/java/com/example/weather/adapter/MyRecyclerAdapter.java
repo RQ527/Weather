@@ -33,7 +33,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 
         holder.cityTextView.setText(data.get(position).getCity());
-        holder.tempTextView.setText(data.get(position).getData().getTemp());
+        holder.tempTextView.setText(data.get(position).getData().getTemp()+"℃");
 
     }
 
@@ -77,4 +77,5 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
 
         void onRecyclerItemLongClick(int position,View view);
     }
+
 }

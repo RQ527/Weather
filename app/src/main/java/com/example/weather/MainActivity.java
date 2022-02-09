@@ -5,13 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.MotionEvent;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -21,52 +23,72 @@ import com.example.weather.bean.Weather;
 import com.example.weather.room.IDispose;
 import com.example.weather.room.MyDataBase;
 import com.example.weather.room.WeatherDao;
+import com.example.weather.utils.NetUtils;
 import com.example.weather.utils.RoomUtils;
 import com.example.weather.view.HomeFragment;
+import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "RQ";
+//    public static Activity instance;
     private static Context context;//全局获取上下文
+
+    public static int flag = 0;
     private ViewPager2 mViewPager;
     private List<HomeFragment> fragments;
     private MyDataBase myDataBase;
     private WeatherDao weatherDao;
     private Button mButton;
-    private LinearLayout mLinearLayout;
+    private ConstraintLayout background;
+    private SwipeRefreshLayout refreshLayout;
+    private FragmentStateAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        context = getApplicationContext();
         setContentView(R.layout.activity_main);
-        myDataBase = MyDataBase.getInstance(this);
-        weatherDao = myDataBase.getWeatherDao();
-
+//        instance = this;
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.hide();
         }
-//        init();
+
         initView();
-//        Weather weather = (Weather) getIntent().getSerializableExtra("weather");
-//        List<Weather> weathers = (List<Weather>) getIntent().getSerializableExtra("weathers");
-//        Log.d(TAG, "onCreate: weather:"+weather);
-//        Log.d(TAG, "onCreate: weathers:"+weathers);
-//        if (weather!=null){
-//            myDiagram.setWeather(weather);
-//            myDiagram.initWeather();
-//            myDiagram.initPath();
-//            myDiagram.invalidate();
-//        }else if (weathers!=null){
-//            myDiagram.setWeather(weathers.get(0));
-//            myDiagram.initWeather();
-//            myDiagram.initPath();
-//            myDiagram.invalidate();
-//        }
+
+    }
+
+    private void initView() {
+        context = getApplicationContext();
+        myDataBase = MyDataBase.getInstance(this);
+        weatherDao = myDataBase.getWeatherDao();
+        mViewPager = findViewById(R.id.vp_home_fragment);
+        mViewPager.setOffscreenPageLimit(5);
+        refreshLayout = findViewById(R.id.srl_main_refresh);
+        refreshLayout.setColorSchemeResources(R.color.blue);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refresh();
+
+            }
+        });
+
+        mButton = findViewById(R.id.bt_toolbar_city);
+        mButton.setOnClickListener(this);
+        fragments = new ArrayList<>();
+
+        background = findViewById(R.id.cl_activity_main_bg);
+
+
         RoomUtils.queryAll(new IDispose() {
             @Override
             public void runOnUi(Weather weather) {
@@ -82,30 +104,69 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     fragment.setWeather(weather);
                     fragments.add(fragment);
                 }
-                FragmentStateAdapter adapter = new FragmentPagerAdapter(MainActivity.this,fragments);
+                adapter = new FragmentPagerAdapter(MainActivity.this,fragments);
                 mViewPager.setAdapter(adapter);
 
             }
         },weatherDao);
 
+
+    }
+
+    private void refresh() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0;i<fragments.size();i++){
+                    try {
+                        upDateWeather(fragments.get(i).getWeather().getCity(),i);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                notifyUpdata();
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                refreshLayout.setRefreshing(false);
+            }
+        }).start();
+    }
+
+    private void notifyUpdata() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 
 
+    private void upDateWeather(String city,int position) throws Exception {
+        NetUtils.sendRequest("https://v2.alapi.cn/api/tianqi", "POST", "city",city
+                , new Callback() {
+                    @Override
+                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                        e.printStackTrace();
+                    }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        super.onTouchEvent(event);
+                    @Override
+                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                        Log.d(TAG, "onResponse: "+response.body().toString());
+                        if (response.isSuccessful()) {
+                            Gson gson = new Gson();
+                            Weather weather = gson.fromJson(response.body().toString(), Weather.class);
+                            HomeFragment fragment = new HomeFragment();
+                            fragment.setWeather(weather);
+                            fragments.set(position,fragment);
+                        }
+                    }
+                });
 
-        return true;
-    }
-
-    private void initView() {
-        mViewPager = findViewById(R.id.vp_home_fragment);
-
-        mButton = findViewById(R.id.bt_toolbar_city);
-        mButton.setOnClickListener(this);
-        fragments = new ArrayList<>();
-        mLinearLayout = findViewById(R.id.ll_home_weatherBackground);
 
     }
 
@@ -125,10 +186,35 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String position = getIntent().getStringExtra("position");
+        Integer index;
+        if (position!=null) {
+            index = Integer.valueOf(position);
+
+                Log.d(TAG, "onResume: "+index);
+
+            Integer finalIndex = index;
+            mViewPager.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mViewPager.setCurrentItem(finalIndex);
+                    }
+                },10);
 
 
+        }
+        if (flag == 1) {
+            Intent intent = new Intent(this,MainActivity.class);
+            startActivity(intent);
+            flag = 0;
+            finish();
+        }
 
 
+    }
 }
 
 
