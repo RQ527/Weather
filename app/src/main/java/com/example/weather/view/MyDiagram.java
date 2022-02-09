@@ -1,7 +1,9 @@
 package com.example.weather.view;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -24,6 +26,7 @@ import android.widget.Scroller;
 import android.widget.TextView;
 
 import androidx.core.view.ViewCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.weather.MainActivity;
 import com.example.weather.R;
@@ -427,6 +430,23 @@ public class MyDiagram extends ViewGroup {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                
+                //拦截刷新
+                getParent().requestDisallowInterceptTouchEvent(true);
+                Context context = getContext();
+                while (context instanceof ContextWrapper) {
+                    if (context instanceof Activity) {
+                        break;
+
+                    }
+
+                    context = ((ContextWrapper) context).getBaseContext();
+
+                }
+                Activity activity = (Activity) context;
+                SwipeRefreshLayout refresh = activity.findViewById(R.id.srl_main_refresh);
+                refresh.setEnabled(false);
+
                 //对应圆环位于后面的情况
                 if (getScrollX() >= (size - 5) * viewWidth) {
                     if ((getScrollX() + event.getX()) > (size - 0.5) * viewWidth) {

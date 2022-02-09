@@ -124,7 +124,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         e.printStackTrace();
                     }
                 }
-                notifyUpdata();
+                notifyUpdate();
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -136,7 +136,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }).start();
     }
 
-    private void notifyUpdata() {
+    private void notifyUpdate() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -159,7 +159,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         Log.d(TAG, "onResponse: "+response.body().toString());
                         if (response.isSuccessful()) {
                             Gson gson = new Gson();
-                            Weather weather = gson.fromJson(response.body().toString(), Weather.class);
+                            Weather weather = gson.fromJson(response.body().string(), Weather.class);
                             HomeFragment fragment = new HomeFragment();
                             fragment.setWeather(weather);
                             fragments.set(position,fragment);
