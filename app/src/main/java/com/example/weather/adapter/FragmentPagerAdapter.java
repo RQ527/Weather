@@ -1,5 +1,7 @@
 package com.example.weather.adapter;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -17,6 +19,7 @@ import java.util.List;
  * @date 2022/1/29
  */
 public class FragmentPagerAdapter extends FragmentStateAdapter {
+    private static final String TAG = "RQ";
     private final List<HomeFragment> fragments;
     public FragmentPagerAdapter(@NonNull FragmentActivity fragmentActivity, List<HomeFragment> fragments) {
         super(fragmentActivity);
@@ -26,6 +29,7 @@ public class FragmentPagerAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
+        Log.d(TAG, "createFragment: "+"YES");
         return fragments.get(position);
     }
 
@@ -33,5 +37,16 @@ public class FragmentPagerAdapter extends FragmentStateAdapter {
     public int getItemCount() {
         return fragments.size();
     }
+
+    @Override
+    public long getItemId(int position) {
+        return fragments.get(position).hashCode();
+    }
+
+    @Override
+    public boolean containsItem(long itemId) {
+        return false;
+    }
+
 
 }

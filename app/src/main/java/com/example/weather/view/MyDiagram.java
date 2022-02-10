@@ -1,9 +1,7 @@
 package com.example.weather.view;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -26,7 +24,6 @@ import android.widget.Scroller;
 import android.widget.TextView;
 
 import androidx.core.view.ViewCompat;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.weather.MainActivity;
 import com.example.weather.R;
@@ -187,10 +184,11 @@ public class MyDiagram extends ViewGroup {
                             "null", "null", "null", "null", "null",
                             "null", "null", "null"), 0, "null", 0);
         }
-        //添加视图之前删除假数据。
 
         //将weather的温度转化成点。
-        points = weatherToPoint(weather);
+        if (weather.getCode()!=0&&weather.getData()!=null) {
+            points = weatherToPoint(weather);
+        }
     }
 
     //重写scrollTo方法防止滑动过度
@@ -430,23 +428,6 @@ public class MyDiagram extends ViewGroup {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                
-                //拦截刷新
-                getParent().requestDisallowInterceptTouchEvent(true);
-                Context context = getContext();
-                while (context instanceof ContextWrapper) {
-                    if (context instanceof Activity) {
-                        break;
-
-                    }
-
-                    context = ((ContextWrapper) context).getBaseContext();
-
-                }
-                Activity activity = (Activity) context;
-                SwipeRefreshLayout refresh = activity.findViewById(R.id.srl_main_refresh);
-                refresh.setEnabled(false);
-
                 //对应圆环位于后面的情况
                 if (getScrollX() >= (size - 5) * viewWidth) {
                     if ((getScrollX() + event.getX()) > (size - 0.5) * viewWidth) {
@@ -461,6 +442,7 @@ public class MyDiagram extends ViewGroup {
                 mFling.stop();
                 break;
             case MotionEvent.ACTION_MOVE:
+
                 //对应圆环位于后面的情况
                 if (getScrollX() >= (size - 5) * viewWidth) {
                     if ((getScrollX() + event.getX()) > (size - 0.5) * viewWidth) {
@@ -626,16 +608,16 @@ public class MyDiagram extends ViewGroup {
     /**
      * weather转化成point的方法
      *
-     * @param weather 数据weather
+     * @param weather2 数据weather
      * @return
      */
-    private List<Point> weatherToPoint(Weather weather) {
+    private List<Point> weatherToPoint(Weather weather2) {
         //用于保存获取的温度
         int temp;
         //点的集合
         List<Point> points = new ArrayList<Point>();
         //获取hours的集合
-        List<Weather.Data.Hour> hours = weather.getData().getHour();
+        List<Weather.Data.Hour> hours = weather2.getData().getHour();
         size = hours.size();
         //获取最小温度
         minTemp = Integer.parseInt(hours.get(0).getTemp());

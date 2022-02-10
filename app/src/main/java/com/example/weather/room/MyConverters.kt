@@ -28,8 +28,9 @@ class MyConverters {
      * 对象转换成json存进数据库
      */
     @TypeConverter
-    fun weatherToString(weather: Weather.Data):String{
+    fun weatherToString(data: Weather.Data):String{
         val gson = Gson()
-        return gson.toJson(weather)
+        return gson.toJson(data)
     }
+
 }

@@ -7,11 +7,13 @@ import android.os.Message;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.example.weather.base.BaseActivity;
 import com.example.weather.bean.Weather;
+import com.example.weather.room.IDispose;
 import com.example.weather.room.MyDataBase;
 import com.example.weather.room.WeatherDao;
 import com.example.weather.utils.NetUtils;
@@ -19,6 +21,7 @@ import com.example.weather.utils.RoomUtils;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -53,7 +56,27 @@ public class AddWeatherActivity extends BaseActivity implements View.OnClickList
         switch (v.getId()){
             case R.id.button2:
                 try {
-                    run();
+                    RoomUtils.queryAll(new IDispose() {
+                        @Override
+                        public void runOnUi(Weather weather) {
+
+                        }
+
+                        @Override
+                        public void runOnUi(List<Weather> weathers) throws Exception {
+                            boolean flag = true;
+                                for (Weather weather:weathers){
+                                    if (weather.getCity().equals(mEditText.getText().toString())){
+                                        Toast.makeText(AddWeatherActivity.this, "城市已存在", Toast.LENGTH_SHORT).show();
+                                        flag = false;
+                                        break;
+                                    }
+                                }
+                                if (flag){
+                                    run();
+                                }
+                        }
+                    },weatherDao);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -92,24 +115,28 @@ public class AddWeatherActivity extends BaseActivity implements View.OnClickList
 
             Gson gson = new Gson();
             Weather weather = gson.fromJson(responseData, Weather.class);
-            weather.setCity(mEditText.getText().toString());
-            if (weather != null) {
-                RoomUtils.insert(weatherDao, weather);
-                String flag = getIntent().getStringExtra("flag");
-                if (flag!=null){
-                    Intent intent;
-                    if (flag.equals("manage")){
-                        intent = new Intent(AddWeatherActivity.this, ManageActivity.class);
-                    }else {
-                        intent = new Intent(AddWeatherActivity.this, MainActivity.class);
+            if (!(weather.getData().getCity()).equals(mEditText.getText().toString())){
+                Toast.makeText(AddWeatherActivity.this, "输入格式错误，请按要求输入。", Toast.LENGTH_SHORT).show();
+            }else {
+                weather.setCity(mEditText.getText().toString());
+                if (weather != null) {
+                    RoomUtils.insert(weatherDao, weather);
+                    String flag = getIntent().getStringExtra("flag");
+                    if (flag != null) {
+                        Intent intent;
+                        if (flag.equals("manage")) {
+                            intent = new Intent(AddWeatherActivity.this, ManageActivity.class);
+                        } else {
+                            intent = new Intent(AddWeatherActivity.this, MainActivity.class);
+                        }
+                        startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(AddWeatherActivity.this, MainActivity.class);
+                        startActivity(intent);
                     }
-                    startActivity(intent);
-                }else {
-                    Intent intent = new Intent(AddWeatherActivity.this, MainActivity.class);
-                    startActivity(intent);
-                }
 
-                finish();
+                    finish();
+                }
             }
         }
     }

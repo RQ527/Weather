@@ -77,8 +77,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+//                refreshLayout.setRefreshing(true);
                 refresh();
-
+                refreshLayout.setEnabled(true);
             }
         });
 
@@ -101,6 +102,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             public void runOnUi(List<Weather> weathers) {
                 for (Weather weather:weathers){
                     HomeFragment fragment = new HomeFragment();
+
                     fragment.setWeather(weather);
                     fragments.add(fragment);
                 }
@@ -114,39 +116,26 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void refresh() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0;i<fragments.size();i++){
-                    try {
-                        upDateWeather(fragments.get(i).getWeather().getCity(),i);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                notifyUpdate();
+        new Thread(() -> {
+            for (int i = 0;i<fragments.size();i++){
                 try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
+                    upDateWeather(fragments.get(i).getWeather().getCity(), i);
+
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-                refreshLayout.setRefreshing(false);
             }
+            refreshLayout.setRefreshing(false);
+
         }).start();
     }
 
-    private void notifyUpdate() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                adapter.notifyDataSetChanged();
-            }
+    private void notifyUpdate(Weather weather,int position) {
+        runOnUiThread(() -> {
+
         });
     }
-
-
-    private void upDateWeather(String city,int position) throws Exception {
+    private void upDateWeather(String city, int position) throws Exception {
         NetUtils.sendRequest("https://v2.alapi.cn/api/tianqi", "POST", "city",city
                 , new Callback() {
                     @Override
@@ -156,17 +145,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
                     @Override
                     public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                        Log.d(TAG, "onResponse: "+response.body().toString());
                         if (response.isSuccessful()) {
                             Gson gson = new Gson();
-                            Weather weather = gson.fromJson(response.body().string(), Weather.class);
-                            HomeFragment fragment = new HomeFragment();
-                            fragment.setWeather(weather);
-                            fragments.set(position,fragment);
+                            Weather weather2 = gson.fromJson(response.body().string(), Weather.class);
+                            weather2.setCity(fragments.get(position).getWeather().getCity());
+
+                        runOnUiThread(() -> {
+                            Log.d(TAG, "run: "+weather2.getCity());
+                            fragments.get(position).setData(weather2);
+                        });
                         }
                     }
                 });
-
 
     }
 
@@ -182,6 +172,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             case R.id.bt_toolbar_city:
                 Intent intent = new Intent(MainActivity.this,ManageActivity.class);
                 startActivity(intent);
+                finish();
                 break;
         }
     }
@@ -190,17 +181,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void onResume() {
         super.onResume();
         String position = getIntent().getStringExtra("position");
+        getIntent().removeExtra("position");
         Integer index;
         if (position!=null) {
             index = Integer.valueOf(position);
 
-                Log.d(TAG, "onResume: "+index);
 
-            Integer finalIndex = index;
             mViewPager.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        mViewPager.setCurrentItem(finalIndex);
+                        mViewPager.setCurrentItem(index);
                     }
                 },10);
 

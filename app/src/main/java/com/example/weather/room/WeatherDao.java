@@ -3,6 +3,7 @@ package com.example.weather.room;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.TypeConverters;
 
 import com.example.weather.bean.Weather;
 
@@ -30,7 +31,9 @@ public interface WeatherDao {
     @Query("DELETE FROM weather WHERE city = :city")
     void deleteByCity(String city);
 
-
+    @Query("UPDATE weather SET City =:city,data =:data WHERE city =:city")
+    @TypeConverters(MyConverters.class)
+    void update(String city,Weather.Data data);
 
 
 

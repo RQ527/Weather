@@ -65,9 +65,7 @@ public class RoomUtils {
      * @param weather 新的的天气对象
      */
     public static void update(WeatherDao weatherDao,Weather weather,String city){
-        //更新方法有问题，所以我采用删除数据库再添加新数据的方法更新
-        delete(weatherDao,city);
-        insert(weatherDao,weather);
+        new UpdateWeatherTask(weatherDao,city,weather).execute();
     }
 
     static class GetAllWeathersTask extends AsyncTask<Void,Void,Void> {
@@ -159,5 +157,22 @@ public class RoomUtils {
             return null;
         }
     }
+    static class UpdateWeatherTask extends AsyncTask<Void,Void,Void> {
 
+        private WeatherDao weatherDao;
+        private String city;
+        private Weather weather;
+
+        public UpdateWeatherTask(WeatherDao weatherDao,String city,Weather weather) {
+            this.weatherDao = weatherDao;
+            this.city = city;
+            this.weather = weather;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            weatherDao.update(city,weather.getData());
+            return null;
+        }
+    }
 }

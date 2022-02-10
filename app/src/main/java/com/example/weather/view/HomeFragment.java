@@ -3,6 +3,7 @@ package com.example.weather.view;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +57,7 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         initView(view);
-        setData();
+        setData(weather);
         return view;
 
     }
@@ -67,40 +68,41 @@ public class HomeFragment extends Fragment {
     }
 
     @SuppressLint("SetTextI18n")
-    private void setData() {
+    public void setData(Weather weather1) {
 
-        if (weather != null) {
-            mMyDiagram.setWeather(weather);
+        if (weather1 != null&&weather1.getData()!=null) {
+            Log.d(TAG, "setData: "+weather1.getCity());
+            mMyDiagram.setWeather(weather1);
             mMyDiagram.initWeather();
             mMyDiagram.initPath();
             mMyDiagram.invalidate();
 
 
-            String time = weather.getData().getUpdate_time();
+            String time = weather1.getData().getUpdate_time();
             int minuteTime = TimeUtils.TimeToMinutes(time.substring(11, 16));
-            int sunrise = TimeUtils.TimeToMinutes(weather.getData().getSunrise());
-            int sunset = TimeUtils.TimeToMinutes(weather.getData().getSunset());
+            int sunrise = TimeUtils.TimeToMinutes(weather1.getData().getSunrise());
+            int sunset = TimeUtils.TimeToMinutes(weather1.getData().getSunset());
             String when = "晚上";
             //判断白天还是晚上用于设置不同的视图
             if (minuteTime >= sunrise && minuteTime <= sunset) {
                 when = "白天";
             }
-            int backgroundPicture = SelectUtils.selectWeatherBackground(weather.getData().getWeather(), when);
+            int backgroundPicture = SelectUtils.selectWeatherBackground(weather1.getData().getWeather(), when);
 
             background.setBackgroundResource(backgroundPicture);
 
-            pmTextView.setText(weather.getData().getAir_pm25());
-            airTextView.setText(weather.getData().getAir());
-            tempTextView.setText(weather.getData().getTemp());
-            visibilityTextView.setText(weather.getData().getVisibility());
-            weatherTextView.setText(weather.getData().getWeather());
-            minToMaxTextView.setText(weather.getData().getMin_temp() + "~" + weather.getData().getMax_temp() + "℃");
+            pmTextView.setText(weather1.getData().getAir_pm25());
+            airTextView.setText(weather1.getData().getAir());
+            tempTextView.setText(weather1.getData().getTemp());
+            visibilityTextView.setText(weather1.getData().getVisibility());
+            weatherTextView.setText(weather1.getData().getWeather());
+            minToMaxTextView.setText(weather1.getData().getMin_temp() + "~" + weather1.getData().getMax_temp() + "℃");
 
-            windDirectionTextView.setText(weather.getData().getWind());
-            windLevelTextView.setText(weather.getData().getWind_speed());
-            visibilityTextView2.setText(weather.getData().getVisibility());
-            pressureTextView.setText(weather.getData().getPressure()+"hPa");
-            humidityTextView.setText(weather.getData().getHumidity());
+            windDirectionTextView.setText(weather1.getData().getWind());
+            windLevelTextView.setText(weather1.getData().getWind_speed());
+            visibilityTextView2.setText(weather1.getData().getVisibility());
+            pressureTextView.setText(weather1.getData().getPressure()+"hPa");
+            humidityTextView.setText(weather1.getData().getHumidity());
 
         }
     }
@@ -126,7 +128,6 @@ public class HomeFragment extends Fragment {
         visibilityTextView = view.findViewById(R.id.tv_home_visibility);
         weatherTextView = view.findViewById(R.id.tv_home_weather);
         minToMaxTextView = view.findViewById(R.id.tv_home_minToMax);
-
 
         mLinearLayout = view.findViewById(R.id.ll_fragment_weatherBackground);
         mScrollView = view.findViewById(R.id.sc_fragment);
@@ -169,21 +170,13 @@ public class HomeFragment extends Fragment {
 
     @SuppressLint("ResourceAsColor")
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-
-    }
-
-    @SuppressLint("ResourceAsColor")
-    @Override
     public void onResume() {
         super.onResume();
 
         mScrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
             @Override
             public void onScrollChanged() {
-                getActivity().findViewById(R.id.srl_main_refresh).setEnabled(mScrollView.getScrollY()==0);
+                getActivity().findViewById(R.id.srl_main_refresh).setEnabled(mScrollView.getScrollY()>=-1&&mScrollView.getScrollY()<=3);
             }
         });
 
@@ -216,4 +209,5 @@ public class HomeFragment extends Fragment {
         }
         mLinearLayout.getBackground().setAlpha(alpha);
     }
+
 }

@@ -101,6 +101,8 @@ public class ManageActivity extends BaseActivity implements View.OnClickListener
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bt_toolbar_back:
+                Intent intent = new Intent(ManageActivity.this, MainActivity.class);
+                startActivity(intent);
                 MainActivity.flag = 1;
                 finish();
                 break;
