@@ -7,17 +7,20 @@
     android:paddingHorizontal="20dp"
     android:orientation="vertical">
     <androidx.cardview.widget.CardView
+        android:id="@+id/cd_recyclerView_background"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        app:cardBackgroundColor="@color/blue"
+        app:cardBackgroundColor="@color/navyBlue"
         app:cardElevation="2dp"
-        app:cardCornerRadius="25dp"
+        app:cardCornerRadius="15dp"
         android:foreground="?android:attr/selectableItemBackground">
 
         <ImageView
+            android:id="@+id/iv_recyclerView_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/sunny_bg1" />
+            android:src="@drawable/cloudy_bg"
+            android:scaleType="centerCrop"/>
 
         <TextView
             android:id="@+id/tv_itemRv_city"
@@ -33,7 +36,7 @@
             android:id="@+id/tv_itemRv_temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="250dp"
+            android:layout_marginStart="250dp"
             android:layout_gravity="center_vertical"
             android:background="@color/none"
             android:text="-36℃"

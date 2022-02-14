@@ -57,7 +57,8 @@ public class SelectUtils {
             case "阴":
                 return R.drawable.overcast_bg;
             case "多云":
-                return R.drawable.cloudy_bg;
+                if (when.equals("白天")) return R.drawable.cloudy_bg;
+                if (when.equals("晚上")) return R.drawable.cloudy_bg2;
             case "大雨":
             case "中雨":
             case "小雨":
@@ -65,9 +66,11 @@ public class SelectUtils {
                 return R.drawable.rainy_bg;
             case "雾霾":
             case "霾":
-                return R.drawable.haze_bg;
+                if (when.equals("白天")) return R.drawable.haze_bg;
+                if (when.equals("晚上")) return R.drawable.night;
             case "雾":
-                return R.drawable.fog_bg;
+                if (when.equals("白天")) return R.drawable.fog_bg;
+                if (when.equals("晚上")) return R.drawable.night;
             case "雨夹雪":
             case "小雪":
             case "中雪":

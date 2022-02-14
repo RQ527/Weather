@@ -10,7 +10,6 @@ import android.graphics.Point;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -121,7 +120,7 @@ public class MyDiagram extends ViewGroup {
             curvePath.cubicTo((points.get(i).x + points.get(i + 1).x) / 2,
                     points.get(i).y,
                     (points.get(i).x + points.get(i + 1).x) / 2,
-                    points.get(i + 1).y, (float) (points.get(i + 1).x + 0.1), points.get(i + 1).y);
+                    points.get(i + 1).y,  points.get(i + 1).x , points.get(i + 1).y);
         }
         dottedPath = new Path();
     }
@@ -256,9 +255,19 @@ public class MyDiagram extends ViewGroup {
             String wind;//风力
             int weatherPicture;//天气图片ID
             int minuteTime;//时间（分钟）
-            Log.d(TAG, "insertView: " + weather.getData().getSunrise());
+            //更新时间.
+            String updateTime = weather.getData().getUpdate_time();
+            int nowTime= TimeUtils.TimeToMinutes(updateTime.substring(11, 16));
+
             int sunrise = TimeUtils.TimeToMinutes(weather.getData().getSunrise());//日出时间（分钟）
             int sunset = TimeUtils.TimeToMinutes(weather.getData().getSunset());//日落时间（分钟）
+
+            int textColor = Color.WHITE;
+            //判断白天还是晚上用于设置不同颜色的字体
+            if (nowTime >= sunrise && nowTime <= sunset) {
+                textColor = Color.BLACK;
+            }
+
             String when = "晚上";//白天还是晚上
             //添加天气视图
             for (int i = 0; i < size; i++) {
@@ -280,19 +289,16 @@ public class MyDiagram extends ViewGroup {
 
                 timeTextView = view.findViewById(R.id.tv_time);
                 timeTextView.setText(time.substring(11, 16));
+                timeTextView.setTextColor(textColor);
 
                 weatherTextview = view.findViewById(R.id.tv_weather);
                 weatherTextview.setText(hour.getWea());
+                weatherTextview.setTextColor(textColor);
 
                 wind = hour.getWind_level();
                 fanTextView = view.findViewById(R.id.tv_fan);
                 fanTextView.setText(wind);
-                //适应字体颜色
-                if (when.equals("晚上")) {
-                    weatherTextview.setTextColor(Color.WHITE);
-                    fanTextView.setTextColor(Color.WHITE);
-                    timeTextView.setTextColor(Color.WHITE);
-                }
+                fanTextView.setTextColor(textColor);
 
                 addView(view);
             }
@@ -369,10 +375,10 @@ public class MyDiagram extends ViewGroup {
             if (getScrollX() >= (viewWidth * (size - 5))) {
                 // 绘制垂直线与曲线取交集
                 linePath.moveTo(drawX, 0);
-                linePath.lineTo(drawX, (height / 2) + 10);
+                linePath.lineTo(drawX, (height / 2) + 1);
 
                 // 这里就直接取一个底为1，高为控件高度的矩形
-                linePath.lineTo(drawX + 1, (height / 2) + 10);
+                linePath.lineTo(drawX + 1, (height / 2) + 1);
                 linePath.lineTo(drawX + 1, 0);
             } else if (getScrollX() < (viewWidth * (size - 5))) {
                 // 绘制垂直线与曲线取交集
@@ -385,7 +391,6 @@ public class MyDiagram extends ViewGroup {
                 linePath.lineTo((float) (getScrollX() + viewWidth / 2.0 + 1), 0);
                 drawX = (float) (getScrollX() + viewWidth / 2.0);
             }
-            linePath.close();
             //取交集
             linePath.op(curvePath, Path.Op.INTERSECT);
 
@@ -395,8 +400,10 @@ public class MyDiagram extends ViewGroup {
             if (rect.top == 0) {
                 //为零就让其在底部
                 drawY = height / 2;
-            } else {
-                drawY = rect.bottom; // 矩形的  bottom 就是圆心 y
+            } else if (points.get(0).y>=points.get(1).y&&points.size()!=0){
+                drawY = rect.top; // 上升的点，矩形的  top 就是圆心 y
+            }else {
+                drawY = rect.bottom; // 下降的点，矩形的  bottom 就是圆心 y
             }
 
             //这里更新的方法用的是郭神的思路，感谢郭神!!!
@@ -453,6 +460,9 @@ public class MyDiagram extends ViewGroup {
                 }
                 break;
             case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:// 被父布局拦截
+                //一旦消费了事件就反拦截
+                getParent().requestDisallowInterceptTouchEvent(true);
                 //对应圆环位于后面的情况
                 if (getScrollX() >= (size - 5) * viewWidth) {
                     drawX = (float) (getScrollX() + viewWidth / 2.0);
@@ -478,7 +488,6 @@ public class MyDiagram extends ViewGroup {
                     adjustUi();
                 }
 
-            case MotionEvent.ACTION_CANCEL: // 被父布局拦截
                 removeCallbacks(mMoveDrawRun);// 抬手或被父布局拦截时关闭 mMoveDrawRun
                 break;
             default:

@@ -1,5 +1,6 @@
 package com.example.weather;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -8,13 +9,11 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,7 +40,7 @@ public class ManageActivity extends BaseActivity implements View.OnClickListener
     private Button backButton;
     private Button addButton;
     private MyRecyclerAdapter recyclerAdapter;
-
+    Intent intent = new Intent();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,15 +63,13 @@ public class ManageActivity extends BaseActivity implements View.OnClickListener
                     recyclerAdapter.setRecyclerItemClickListener(new MyRecyclerAdapter.onRecyclerItemClickListener() {
                         @Override
                         public void onRecyclerItemClick(int position, View view) {
-                            Intent intent = new Intent(ManageActivity.this,MainActivity.class);
                             intent.putExtra("position",String.valueOf(position));
-                            startActivity(intent);
+                            setResult(0,intent);
                             finish();
                         }
 
                         @Override
                         public void onRecyclerItemLongClick(int position, View view) {
-                            Toast.makeText(ManageActivity.this, "长按", Toast.LENGTH_SHORT).show();
                             openPopupWindow(view,position);
                         }
 
@@ -101,16 +98,12 @@ public class ManageActivity extends BaseActivity implements View.OnClickListener
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bt_toolbar_back:
-                Intent intent = new Intent(ManageActivity.this, MainActivity.class);
-                startActivity(intent);
-                MainActivity.flag = 1;
                 finish();
                 break;
             case R.id.bt_toolbar_addCity:
                 Intent intent2 = new Intent(ManageActivity.this, AddWeatherActivity.class);
                 intent2.putExtra("flag", "manage");
-                startActivity(intent2);
-                finish();
+                startActivityForResult(intent2,0);
                 break;
         }
     }
@@ -135,41 +128,31 @@ public class ManageActivity extends BaseActivity implements View.OnClickListener
             }
         };
         listView.setAdapter(adapter);
-        Log.d(TAG, "onItemClick: "+mPosition);
-        TextView city = mView.findViewById(R.id.tv_itemRv_city);
-        for (Weather weather:data){
-            if (weather.getCity().equals(city.getText().toString())){
-                //data.remove(weather);
-//                Log.d(TAG, "openPopupWindow: "+data.remove(weather));
-                //recyclerAdapter.notifyItemRemoved(mPosition);
-            }
-        }
+
         //设置点击事件
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        listView.setOnItemClickListener((parent, view1, position, id) -> {
 
-                TextView city = mView.findViewById(R.id.tv_itemRv_city);
-                for (Weather weather:data){
-                    if (weather.getCity().equals(city.getText().toString())){
-                        data.remove(weather);
-
-                        recyclerAdapter.notifyItemRemoved(mPosition);
-                        break;
-                    }
+            TextView city = mView.findViewById(R.id.tv_itemRv_city);
+            for (Weather weather:data){
+                if (weather.getCity().equals(city.getText().toString())){
+                    data.remove(weather);
+                    recyclerAdapter.notifyItemRemoved(mPosition);
+                    break;
                 }
-                RoomUtils.delete(weatherDao, city.getText().toString());
-                if (data.size() == 0) {
-                    Intent intent = new Intent(ManageActivity.this, AddWeatherActivity.class);
-                    intent.putExtra("flag", "manage");
-                    startActivity(intent);
-                    finish();
-                }
-
-                //影藏弹窗
-                dismissPopupWindow();
             }
 
+            RoomUtils.delete(weatherDao, city.getText().toString());
+            intent.putExtra("position2",String.valueOf(mPosition));
+            setResult(0,intent);
+
+            if (data.size() == 0) {
+                Intent intent = new Intent(ManageActivity.this, AddWeatherActivity.class);
+                intent.putExtra("flag", "manage");
+                startActivityForResult(intent,0);
+            }
+
+            //影藏弹窗
+            dismissPopupWindow();
         });
 
         popupWindow = new PopupWindow(view, 250, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -184,6 +167,25 @@ public class ManageActivity extends BaseActivity implements View.OnClickListener
         if (popupWindow != null && popupWindow.isShowing()) {
             popupWindow.dismiss();
             popupWindow = null;
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult: "+(this.data.size()));
+        if (data!=null) {
+//            if (this.data.size() == 0) {
+//                Intent intent = new Intent(ManageActivity.this, ManageActivity.class);
+//                startActivity(intent);
+//                finish();
+//            } else {
+                Weather weather = (Weather) data.getSerializableExtra("weather");
+                this.data.add(weather);
+                recyclerAdapter.notifyDataSetChanged();
+
+
         }
     }
 }

@@ -8,8 +8,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -39,10 +42,7 @@ import okhttp3.Response;
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "RQ";
-//    public static Activity instance;
     private static Context context;//全局获取上下文
-
-    public static int flag = 0;
     private ViewPager2 mViewPager;
     private List<HomeFragment> fragments;
     private MyDataBase myDataBase;
@@ -51,12 +51,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private ConstraintLayout background;
     private SwipeRefreshLayout refreshLayout;
     private FragmentStateAdapter adapter;
+    private LinearLayout pointLinearLayout;
+    private int prePosition = 0;
+    private int mState = -1;
+
+    public int getState() {
+        return mState;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        instance = this;
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.hide();
@@ -67,22 +73,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void initView() {
+        pointLinearLayout = findViewById(R.id.ll_home_point);
         context = getApplicationContext();
         myDataBase = MyDataBase.getInstance(this);
         weatherDao = myDataBase.getWeatherDao();
         mViewPager = findViewById(R.id.vp_home_fragment);
-        mViewPager.setOffscreenPageLimit(5);
+        mViewPager.setOffscreenPageLimit(10);
         refreshLayout = findViewById(R.id.srl_main_refresh);
         refreshLayout.setColorSchemeResources(R.color.blue);
-        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-//                refreshLayout.setRefreshing(true);
-                refresh();
-                refreshLayout.setEnabled(true);
-            }
+        refreshLayout.setOnRefreshListener(() -> {
+            refresh();
         });
-
         mButton = findViewById(R.id.bt_toolbar_city);
         mButton.setOnClickListener(this);
         fragments = new ArrayList<>();
@@ -100,14 +101,53 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             @SuppressLint("RestrictedApi")
             @Override
             public void runOnUi(List<Weather> weathers) {
-                for (Weather weather:weathers){
+                for (int i =0;i<weathers.size();i++){
+                    Weather weather = weathers.get(i);
                     HomeFragment fragment = new HomeFragment();
-
                     fragment.setWeather(weather);
                     fragments.add(fragment);
+
+                    ImageView point = new ImageView(MainActivity.this);
+                    point.setBackgroundResource(R.drawable.point_selector);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(10,10);
+
+                    if (i==0){
+                        point.setEnabled(true);
+                    }else {
+                        point.setEnabled(false);
+                        params.leftMargin = 10;
+                    }
+
+
+                    point.setLayoutParams(params);
+
+                    pointLinearLayout.addView(point);
                 }
                 adapter = new FragmentPagerAdapter(MainActivity.this,fragments);
                 mViewPager.setAdapter(adapter);
+                mViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+                    @Override
+                    public void onPageSelected(int position) {
+                        super.onPageSelected(position);
+                        pointLinearLayout.getChildAt(prePosition).setEnabled(false);
+                        pointLinearLayout.getChildAt(position).setEnabled(true);
+                        prePosition = position;
+                    }
+
+                    @Override
+                    public void onPageScrollStateChanged(int state) {
+                        super.onPageScrollStateChanged(state);
+                        mState = state;
+                        if (state==ViewPager2.SCROLL_STATE_DRAGGING){
+                            runOnUiThread(() -> refreshLayout.setEnabled(false));
+
+                        }
+                        if (state==ViewPager2.SCROLL_STATE_SETTLING||state==ViewPager2.SCROLL_STATE_IDLE){
+                            runOnUiThread(() -> refreshLayout.setEnabled(true));
+
+                        }
+                    }
+                });
 
             }
         },weatherDao);
@@ -125,16 +165,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     e.printStackTrace();
                 }
             }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             refreshLayout.setRefreshing(false);
 
         }).start();
     }
 
-    private void notifyUpdate(Weather weather,int position) {
-        runOnUiThread(() -> {
-
-        });
-    }
     private void upDateWeather(String city, int position) throws Exception {
         NetUtils.sendRequest("https://v2.alapi.cn/api/tianqi", "POST", "city",city
                 , new Callback() {
@@ -171,8 +211,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.bt_toolbar_city:
                 Intent intent = new Intent(MainActivity.this,ManageActivity.class);
-                startActivity(intent);
-                finish();
+                startActivityForResult(intent,0);
                 break;
         }
     }
@@ -182,28 +221,41 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         super.onResume();
         String position = getIntent().getStringExtra("position");
         getIntent().removeExtra("position");
-        Integer index;
-        if (position!=null) {
-            index = Integer.valueOf(position);
+        Log.d(TAG, "onResume: "+position);
+        if (position != null) {
+            Integer index = Integer.valueOf(position);
+            mViewPager.postDelayed(() -> mViewPager.setCurrentItem(index), 10);
+        }
+    }
 
-
-            mViewPager.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mViewPager.setCurrentItem(index);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (resultCode) {
+            case 0:
+            if (data != null) {
+                String position = data.getStringExtra("position");
+                String position2 = data.getStringExtra("position2");
+                if (position != null || position2 != null) {
+//                    index = Integer.valueOf(position);
+//                    if (index >= fragments.size()) {
+//                        Log.d(TAG, "onActivityResult: "+"yyyy");
+//                        adapter.notifyDataSetChanged();
+//                    }
+//                    mViewPager.postDelayed(() -> mViewPager.setCurrentItem(index), 10);
+                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                    if (position != null) {
+                        intent.putExtra("position", position);
                     }
-                },10);
+                    startActivity(intent);
+                    finish();
+                }
+
+            }
+            break;
 
 
         }
-        if (flag == 1) {
-            Intent intent = new Intent(this,MainActivity.class);
-            startActivity(intent);
-            flag = 0;
-            finish();
-        }
-
-
     }
 }
 

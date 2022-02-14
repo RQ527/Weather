@@ -1,5 +1,6 @@
 package com.example.weather;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,7 +30,8 @@ import okhttp3.Response;
 
 public class AddWeatherActivity extends BaseActivity implements View.OnClickListener {
     private EditText mEditText;
-    private Button mButton;
+    private Button addButton;
+    private Button backButton;
     private MyHandler mHandler;
     private WeatherDao weatherDao;
     private MyDataBase myDataBase;
@@ -47,14 +49,19 @@ public class AddWeatherActivity extends BaseActivity implements View.OnClickList
         weatherDao = myDataBase.getWeatherDao();
         mHandler = new MyHandler();
         mEditText = findViewById(R.id.editText2);
-        mButton = findViewById(R.id.button2);
-        mButton.setOnClickListener(this);
+        addButton = findViewById(R.id.bt_addWeather_add);
+        backButton = findViewById(R.id.bt_addWeather_back);
+        backButton.setOnClickListener(this);
+        addButton.setOnClickListener(this);
+
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.button2:
+            case R.id.bt_addWeather_add:
+                addButton.setClickable(false);
                 try {
                     RoomUtils.queryAll(new IDispose() {
                         @Override
@@ -65,13 +72,21 @@ public class AddWeatherActivity extends BaseActivity implements View.OnClickList
                         @Override
                         public void runOnUi(List<Weather> weathers) throws Exception {
                             boolean flag = true;
-                                for (Weather weather:weathers){
-                                    if (weather.getCity().equals(mEditText.getText().toString())){
+                            if (weathers.size()==8){
+                                flag = false;
+                                Toast.makeText(AddWeatherActivity.this, "城市数量已达上限，请删除一些城市再添加。"
+                                        , Toast.LENGTH_SHORT).show();
+                                addButton.setClickable(true);
+                            }else {
+                                for (Weather weather : weathers) {
+                                    if (weather.getCity().equals(mEditText.getText().toString())) {
                                         Toast.makeText(AddWeatherActivity.this, "城市已存在", Toast.LENGTH_SHORT).show();
                                         flag = false;
+                                        addButton.setClickable(true);
                                         break;
                                     }
                                 }
+                            }
                                 if (flag){
                                     run();
                                 }
@@ -80,6 +95,9 @@ public class AddWeatherActivity extends BaseActivity implements View.OnClickList
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                break;
+            case R.id.bt_addWeather_back:
+                finish();
                 break;
         }
     }
@@ -117,6 +135,7 @@ public class AddWeatherActivity extends BaseActivity implements View.OnClickList
             Weather weather = gson.fromJson(responseData, Weather.class);
             if (!(weather.getData().getCity()).equals(mEditText.getText().toString())){
                 Toast.makeText(AddWeatherActivity.this, "输入格式错误，请按要求输入。", Toast.LENGTH_SHORT).show();
+                addButton.setClickable(true);
             }else {
                 weather.setCity(mEditText.getText().toString());
                 if (weather != null) {
@@ -125,11 +144,15 @@ public class AddWeatherActivity extends BaseActivity implements View.OnClickList
                     if (flag != null) {
                         Intent intent;
                         if (flag.equals("manage")) {
-                            intent = new Intent(AddWeatherActivity.this, ManageActivity.class);
+                            Intent intent1 = new Intent();
+                            intent1.putExtra("weather",weather);
+                            setResult(0,intent1);
+                            Toast.makeText(AddWeatherActivity.this, "添加成功", Toast.LENGTH_SHORT).show();
+                            finish();
                         } else {
                             intent = new Intent(AddWeatherActivity.this, MainActivity.class);
+                            startActivity(intent);
                         }
-                        startActivity(intent);
                     } else {
                         Intent intent = new Intent(AddWeatherActivity.this, MainActivity.class);
                         startActivity(intent);

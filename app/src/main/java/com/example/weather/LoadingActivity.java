@@ -2,6 +2,7 @@ package com.example.weather;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -37,11 +38,7 @@ public class LoadingActivity extends BaseActivity {
 
         new Thread(() -> {
             update();
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
             RoomUtils.queryAll(new IDispose() {
                 @Override
                 public void runOnUi(Weather weather) {
@@ -87,14 +84,16 @@ public class LoadingActivity extends BaseActivity {
                                 @Override
                                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                                     if (response.isSuccessful()) {
+                                        String json = response.body().string();
+                                        Log.d(TAG, "onResponse: "+json);
                                         Gson gson = new Gson();
-                                        Weather weather2 = gson.fromJson(response.body().string(), Weather.class);
+                                        Weather weather2 = gson.fromJson(json, Weather.class);
                                         weather2.setCity(weather.getCity());
-
                                         RoomUtils.update(weatherDao, weather2, weather2.getCity());
                                     }
                                 }
                             });
+                    Thread.sleep(500);
                 }
             }
         }, weatherDao);
