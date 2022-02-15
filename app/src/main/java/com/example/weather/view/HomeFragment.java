@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -39,12 +40,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
     private CardView adviceCardView;
     private ConstraintLayout mConstraintLayout;
     private ConstraintLayout topConstraintLayout;
-    private LinearLayout mLinearLayout;
+    private ImageView backgroundImageView;
     private LinearLayout visibilityLinearLayout;
     private LinearLayout humidityLinearLayout;
     private LinearLayout pressureLinearLayout;
     private LinearLayout windLinearLayout;
-    private LinearLayout background;
     private TextView pressureTextView;
     private TextView humidityTextView;
     private TextView windDirectionTextView;
@@ -118,7 +118,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
             }
             //挑选背景图片
             int backgroundPicture = SelectUtils.selectWeatherBackground(weather1.getData().getWeather(), when);
-            background.setBackgroundResource(backgroundPicture);
+            backgroundImageView.setImageResource(backgroundPicture);
             //防止某些小地区没有数据
             if (weather1.getData().getAir_pm25() != null) {
                 pmTextView.setText(weather1.getData().getAir_pm25());
@@ -168,8 +168,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
         topConstraintLayout.setOnClickListener(this);
         adviceCardView.setOnClickListener(this);
 
-        background = view.findViewById(R.id.ll_fragment_weatherBackground);
-
         visibilityLinearLayout = view.findViewById(R.id.ll_fragment_visibility);
         humidityLinearLayout = view.findViewById(R.id.ll_fragment_humidity);
         pressureLinearLayout = view.findViewById(R.id.ll_fragment_pressure);
@@ -196,7 +194,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
         weatherTextView = view.findViewById(R.id.tv_home_weather);
         minToMaxTextView = view.findViewById(R.id.tv_home_minToMax);
 
-        mLinearLayout = view.findViewById(R.id.ll_fragment_weatherBackground);
+        backgroundImageView = view.findViewById(R.id.ll_fragment_weatherBackground);
         mScrollView = view.findViewById(R.id.sc_fragment);
         //scrollView设置监听
         mScrollView.setScrollListener((l, t, oldl, oldt) -> {
@@ -207,7 +205,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
             if (alpha > 255) {
                 alpha = 255;
             }
-            mLinearLayout.getBackground().setAlpha(alpha);
+            backgroundImageView.getDrawable().setAlpha(alpha);
         });
 
         //风车背景旋转
@@ -292,7 +290,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
         if (alpha > 255) {
             alpha = 255;
         }
-        mLinearLayout.getBackground().setAlpha(alpha);
+        backgroundImageView.getDrawable().setAlpha(alpha);
     }
 
     @Override

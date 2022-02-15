@@ -23,7 +23,8 @@ public class SelectUtils {
                 if (when.equals("晚上")) return R.drawable.sunny2;
                 break;
             case "阴":
-                return R.drawable.overcast;
+                if (when.equals("白天")) return R.drawable.overcast;
+                if (when.equals("晚上")) return R.drawable.overcast2;
             case "多云":
                 if (when.equals("白天")) return R.drawable.cloudy1;
                 if (when.equals("晚上")) return R.drawable.cloudy2;

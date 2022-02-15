@@ -6,11 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".view.HomeFragment">
 
-    <LinearLayout
+    <ImageView
         android:id="@+id/ll_fragment_weatherBackground"
         android:layout_width="match_parent"
         android:layout_height="500dp"
-        android:background="@drawable/sunny_bg1"
+        android:src="@drawable/sunny_bg1"
+        android:scaleType="centerCrop"
         android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
