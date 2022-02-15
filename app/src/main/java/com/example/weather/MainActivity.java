@@ -29,6 +29,7 @@ import com.example.weather.room.WeatherDao;
 import com.example.weather.utils.NetUtils;
 import com.example.weather.utils.RoomUtils;
 import com.example.weather.view.HomeFragment;
+import com.example.weather.view.MyMenu;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -50,11 +51,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private SwipeRefreshLayout refreshLayout;
     private FragmentStateAdapter adapter;
     private LinearLayout pointLinearLayout;//tabLayout的指示点
+    private MyMenu menu;
     @SuppressLint("StaticFieldLeak")
     private static Context context;//全局获取上下文
     private int prePosition = 0;//上一页的位置
     private int mState = -1;//viewpager的状态值
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +86,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         });
         addCityButton = findViewById(R.id.bt_toolbar_city);
         addCityButton.setOnClickListener(this);
+        menu = findViewById(R.id.mm_toolbar_menu);
+        menu.setListen(position -> {
+            if (position==1){
+                Intent intent = new Intent(MainActivity.this,AboutActivity.class);
+                startActivity(intent);
+            }
+        });
         fragments = new ArrayList<>();
         //为fragment加载数据
         RoomUtils.queryAll(new IDispose() {

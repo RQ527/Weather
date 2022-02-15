@@ -8,6 +8,7 @@
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/drawable/point_pressed.xml" value="0.26979166666666665" />
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/drawable/point_selector.xml" value="0.26979166666666665" />
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/drawable/shape_popupwindow.xml" value="0.26979166666666665" />
+        <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/activity_about.xml" value="0.23369565217391305" />
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/activity_add_weather.xml" value="0.21875" />
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/activity_detail.xml" value="0.23369565217391305" />
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/activity_loading.xml" value="0.213768115942029" />
@@ -23,6 +24,7 @@
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/toobar_home.xml" value="0.22327898550724637" />
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/layout/toolbar_home.xml" value="0.21331521739130435" />
         <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/menu/menu_home.xml" value="0.25364583333333335" />
+        <entry key="..\:/AndroidTool/AndroidProject/Weather/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.26979166666666665" />
       </map>
     </option>
   </component>

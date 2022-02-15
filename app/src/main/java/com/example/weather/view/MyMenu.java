@@ -39,6 +39,7 @@ public class MyMenu extends View implements View.OnClickListener{
     //图片的缩放比例
     private float scaleX;
     private float scaleY;
+    private MyMenuListener listen;
 
     public MyMenu(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -134,9 +135,12 @@ public class MyMenu extends View implements View.OnClickListener{
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                //点击反应
-                Toast.makeText(MainActivity.getContext(), data[position], Toast.LENGTH_SHORT).show();
+                if (data[position].equals("关于")&&listen!=null){
+                    listen.itemListen(position);
+                }else {
+                    //点击反应
+                    Toast.makeText(MainActivity.getContext(), data[position], Toast.LENGTH_SHORT).show();
+                }
                 //影藏弹窗
                 dismissPopupWindow();
             }
@@ -155,5 +159,20 @@ public class MyMenu extends View implements View.OnClickListener{
             popupWindow.dismiss();
             popupWindow = null;
         }
+    }
+
+    /**
+     * menu监听接口
+     */
+    public interface MyMenuListener{
+        void itemListen(int position);
+    }
+
+    /**
+     * 为menu设置监听
+     * @param listen
+     */
+    public void setListen(MyMenuListener listen) {
+        this.listen = listen;
     }
 }
