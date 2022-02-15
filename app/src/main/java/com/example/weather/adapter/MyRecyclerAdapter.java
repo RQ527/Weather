@@ -19,8 +19,15 @@ import com.example.weather.utils.TimeUtils;
 
 import java.util.List;
 
+/**
+ * ...
+ * recyclerView适配器
+ * @author 1799796122 (Ran Sixiang)
+ * @email 1799796122@qq.com
+ * @date 2022/2/5
+ */
 public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.MyViewHolder>{
-    private List<Weather> data;
+    private List<Weather> data;//数据源
     private Context context;
 
     public MyRecyclerAdapter(List<Weather> data, Context context) {
@@ -39,12 +46,12 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Weather weather = data.get(position);
+        //判断白天还是晚上用于设置不同的背景
         String time = weather.getData().getUpdate_time();
         int minuteTime = TimeUtils.TimeToMinutes(time.substring(11, 16));
         int sunrise = TimeUtils.TimeToMinutes(weather.getData().getSunrise());
         int sunset = TimeUtils.TimeToMinutes(weather.getData().getSunset());
         String when = "晚上";
-        //判断白天还是晚上用于设置不同的视图
         if (minuteTime >= sunrise && minuteTime <= sunset) {
             when = "白天";
             holder.backgroundCardView.setCardBackgroundColor(Color.parseColor("#6699FF"));

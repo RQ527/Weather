@@ -35,7 +35,7 @@ public class NetUtils {
                     .url(url)
                     .build();
         } else if (order.equals("Post") || order.equals("post") || order.equals("POST")) {
-
+            //请求体
             FormBody formBody = new FormBody.Builder()
                     .add("token", "MFyGNtFWMZOlVL2l")
                     .add(name, value)
@@ -47,6 +47,7 @@ public class NetUtils {
         } else {
             throw new Exception("请求命令错误");
         }
+        //回调
         Call call = okHttpClient.newCall(request);
         call.enqueue(callback);
 

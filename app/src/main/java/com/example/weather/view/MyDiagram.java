@@ -580,7 +580,7 @@ public class MyDiagram extends ViewGroup {
             if (diffX != 0) {
                 // 超出右边界，进行修正
                 if (getScrollX() + diffX >= (viewWidth) * size) {
-                    diffX = (int) ((viewWidth) * size - getScrollX());
+                    diffX = (viewWidth) * size - getScrollX();
                     isEnd = true;
                 }
                 // 超出左边界，进行修正

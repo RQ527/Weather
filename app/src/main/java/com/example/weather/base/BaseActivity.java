@@ -25,6 +25,10 @@ public class BaseActivity extends AppCompatActivity {
         setStatusBarTranslation();
 
     }
+
+    /**
+     * 设置状态栏和导航栏透明，增加体验
+     */
     protected void setStatusBarTranslation() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             //需要设置这个 flag 才能调用 setStatusBarColor 来设置状态栏颜色

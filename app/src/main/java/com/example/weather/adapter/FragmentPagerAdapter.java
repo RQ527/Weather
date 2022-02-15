@@ -1,7 +1,5 @@
 package com.example.weather.adapter;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -13,7 +11,7 @@ import java.util.List;
 
 /**
  * ...
- *
+ * fragment适配器
  * @author 1799796122 (Ran Sixiang)
  * @email 1799796122@qq.com
  * @date 2022/1/29
@@ -29,7 +27,6 @@ public class FragmentPagerAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        Log.d(TAG, "createFragment: "+"YES");
         return fragments.get(position);
     }
 

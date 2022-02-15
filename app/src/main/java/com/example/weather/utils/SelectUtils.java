@@ -49,6 +49,12 @@ public class SelectUtils {
         return R.drawable.test;
     }
 
+    /**
+     * 通过天气挑选背景
+     * @param weather
+     * @param when
+     * @return
+     */
     public static int selectWeatherBackground(String weather,String when){
         switch (weather){
             case "晴":

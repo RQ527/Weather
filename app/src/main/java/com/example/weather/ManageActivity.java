@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,19 +35,19 @@ public class ManageActivity extends BaseActivity implements View.OnClickListener
     private RecyclerView mRecyclerView;
     private WeatherDao weatherDao;
     private MyDataBase myDataBase;
-    private ArrayList<Weather> data;
+    private ArrayList<Weather> data;//recyclerView的数据源
     private Button backButton;
     private Button addButton;
     private MyRecyclerAdapter recyclerAdapter;
-    Intent intent = new Intent();
+    private Intent intent = new Intent();//用于携带数据
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage);
         initView();
+        //加载数据
         RoomUtils.queryAll(new IDispose() {
-
             @Override
             public void runOnUi(Weather weather) {
 
@@ -56,13 +55,16 @@ public class ManageActivity extends BaseActivity implements View.OnClickListener
             @Override
             public void runOnUi(List<Weather> weathers) {
                 if (weathers != null) {
+                    //遍历weathers添加数据
                     for (Weather weather : weathers) {
                         data.add(weather);
                     }
                     recyclerAdapter = new MyRecyclerAdapter(data, ManageActivity.this);
+                    //设置item监听
                     recyclerAdapter.setRecyclerItemClickListener(new MyRecyclerAdapter.onRecyclerItemClickListener() {
                         @Override
                         public void onRecyclerItemClick(int position, View view) {
+                            //点击就跳转，并携带位置
                             intent.putExtra("position",String.valueOf(position));
                             setResult(0,intent);
                             finish();
@@ -70,10 +72,12 @@ public class ManageActivity extends BaseActivity implements View.OnClickListener
 
                         @Override
                         public void onRecyclerItemLongClick(int position, View view) {
+                            //长按弹出窗口
                             openPopupWindow(view,position);
                         }
 
                     });
+
                     mRecyclerView.setAdapter(recyclerAdapter);
                     mRecyclerView.setLayoutManager(new LinearLayoutManager(ManageActivity.this));
 
@@ -89,8 +93,8 @@ public class ManageActivity extends BaseActivity implements View.OnClickListener
         weatherDao = myDataBase.getWeatherDao();
         data = new ArrayList<>();
         backButton = findViewById(R.id.bt_toolbar_back);
-        backButton.setOnClickListener(this);
         addButton = findViewById(R.id.bt_toolbar_addCity);
+        backButton.setOnClickListener(this);
         addButton.setOnClickListener(this);
     }
 
@@ -144,7 +148,7 @@ public class ManageActivity extends BaseActivity implements View.OnClickListener
             RoomUtils.delete(weatherDao, city.getText().toString());
             intent.putExtra("position2",String.valueOf(mPosition));
             setResult(0,intent);
-
+            //如果删完了就跳转至添加城市界面
             if (data.size() == 0) {
                 Intent intent = new Intent(ManageActivity.this, AddWeatherActivity.class);
                 intent.putExtra("flag", "manage");
@@ -174,18 +178,11 @@ public class ManageActivity extends BaseActivity implements View.OnClickListener
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult: "+(this.data.size()));
         if (data!=null) {
-//            if (this.data.size() == 0) {
-//                Intent intent = new Intent(ManageActivity.this, ManageActivity.class);
-//                startActivity(intent);
-//                finish();
-//            } else {
+                //添加后通知recyclerView更新
                 Weather weather = (Weather) data.getSerializableExtra("weather");
                 this.data.add(weather);
                 recyclerAdapter.notifyDataSetChanged();
-
-
         }
     }
 }

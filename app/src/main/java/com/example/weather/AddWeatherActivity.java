@@ -61,6 +61,7 @@ public class AddWeatherActivity extends BaseActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.bt_addWeather_add:
+                //防止连击多次添加数据
                 addButton.setClickable(false);
                 try {
                     RoomUtils.queryAll(new IDispose() {
@@ -68,27 +69,28 @@ public class AddWeatherActivity extends BaseActivity implements View.OnClickList
                         public void runOnUi(Weather weather) {
 
                         }
-
                         @Override
                         public void runOnUi(List<Weather> weathers) throws Exception {
-                            boolean flag = true;
+                            //是否访问获取数据
+                            boolean isRequest = true;
                             if (weathers.size()==8){
-                                flag = false;
+                                isRequest = false;
                                 Toast.makeText(AddWeatherActivity.this, "城市数量已达上限，请删除一些城市再添加。"
                                         , Toast.LENGTH_SHORT).show();
                                 addButton.setClickable(true);
                             }else {
+                                //判断是否已存在城市
                                 for (Weather weather : weathers) {
                                     if (weather.getCity().equals(mEditText.getText().toString())) {
                                         Toast.makeText(AddWeatherActivity.this, "城市已存在", Toast.LENGTH_SHORT).show();
-                                        flag = false;
+                                        isRequest = false;
                                         addButton.setClickable(true);
                                         break;
                                     }
                                 }
                             }
-                                if (flag){
-                                    run();
+                                if (isRequest){
+                                    request();
                                 }
                         }
                     },weatherDao);
@@ -101,7 +103,12 @@ public class AddWeatherActivity extends BaseActivity implements View.OnClickList
                 break;
         }
     }
-    private void run() throws Exception {
+
+    /**
+     * 访问数据
+     * @throws Exception
+     */
+    private void request() throws Exception {
         NetUtils.sendRequest("https://v2.alapi.cn/api/tianqi", "POST", "city", mEditText.getText().toString()
                 , new Callback() {
                     @Override
@@ -130,9 +137,8 @@ public class AddWeatherActivity extends BaseActivity implements View.OnClickList
             super.handleMessage(msg);
 
             String responseData = msg.obj.toString();
-
             Gson gson = new Gson();
-            Weather weather = gson.fromJson(responseData, Weather.class);
+            Weather weather = gson.fromJson(responseData, Weather.class);//剥壳
             if (!(weather.getData().getCity()).equals(mEditText.getText().toString())){
                 Toast.makeText(AddWeatherActivity.this, "输入格式错误，请按要求输入。", Toast.LENGTH_SHORT).show();
                 addButton.setClickable(true);
@@ -140,6 +146,7 @@ public class AddWeatherActivity extends BaseActivity implements View.OnClickList
                 weather.setCity(mEditText.getText().toString());
                 if (weather != null) {
                     RoomUtils.insert(weatherDao, weather);
+                    //判断是从哪个activity跳转过来
                     String flag = getIntent().getStringExtra("flag");
                     if (flag != null) {
                         Intent intent;

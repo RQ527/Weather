@@ -2,7 +2,6 @@ package com.example.weather;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -38,7 +37,6 @@ public class LoadingActivity extends BaseActivity {
 
         new Thread(() -> {
             update();
-
             RoomUtils.queryAll(new IDispose() {
                 @Override
                 public void runOnUi(Weather weather) {
@@ -63,6 +61,9 @@ public class LoadingActivity extends BaseActivity {
 
     }
 
+    /**
+     * 更新数据
+     */
     private void update() {
         RoomUtils.queryAll(new IDispose() {
             @Override
@@ -72,6 +73,7 @@ public class LoadingActivity extends BaseActivity {
 
             @Override
             public void runOnUi(List<Weather> weathers) throws Exception {
+//                遍历数据库的weathers进行更新
                 for (Weather weather : weathers) {
 
                     NetUtils.sendRequest("https://v2.alapi.cn/api/tianqi", "POST", "city", weather.getCity()
@@ -85,7 +87,6 @@ public class LoadingActivity extends BaseActivity {
                                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                                     if (response.isSuccessful()) {
                                         String json = response.body().string();
-                                        Log.d(TAG, "onResponse: "+json);
                                         Gson gson = new Gson();
                                         Weather weather2 = gson.fromJson(json, Weather.class);
                                         weather2.setCity(weather.getCity());
@@ -93,6 +94,7 @@ public class LoadingActivity extends BaseActivity {
                                     }
                                 }
                             });
+                    //防止一次访问接口的次数过多
                     Thread.sleep(500);
                 }
             }

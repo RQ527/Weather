@@ -18,11 +18,9 @@ import com.example.weather.bean.Weather;
 @Database(entities = {Weather.class},version = 1,exportSchema = false)
 public abstract class MyDataBase extends RoomDatabase {
 
-    private static final String DATABASE_NAME = "my_db.db";
+    private static final String DATABASE_NAME = "my_db.db";//名字
     private static MyDataBase mInstance;
-
-
-
+    //获取数据库
     public static synchronized MyDataBase getInstance(Context context){
         if (mInstance==null){
             mInstance = Room.databaseBuilder(context.getApplicationContext(),MyDataBase.class
